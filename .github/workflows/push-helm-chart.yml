@@ -63,6 +63,6 @@ jobs:
 
           # Push using Helm OCI
           echo "Pushing to OCI registry..."
-          helm push $PACKAGE_NAME oci://ghcr.io/${{ github.repository_owner }}/charts
+          helm push $PACKAGE_NAME oci://ghcr.io/${{ github.repository_owner }}
 
           echo "Helm chart published to ghcr.io/${{ github.repository_owner }}/charts/mcp-trino:$PACKAGE_VERSION"
