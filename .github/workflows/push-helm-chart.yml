@@ -55,6 +55,9 @@ jobs:
           mkdir -p .cr-release-packages
           helm package charts/mcp-trino --destination .cr-release-packages
 
+      - name: Set lowercase repo name
+        run: echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Push Helm Chart to GHCR
         run: |
           PACKAGE_NAME=$(ls .cr-release-packages/mcp-trino-*.tgz)
@@ -63,6 +66,6 @@ jobs:
 
           # Push using Helm OCI
           echo "Pushing to OCI registry..."
-          helm push $PACKAGE_NAME oci://ghcr.io/${{ github.repository_owner }}
+          helm push $PACKAGE_NAME oci://ghcr.io/${{ env.REPO_LOWER }}/charts
 
-          echo "Helm chart published to ghcr.io/${{ github.repository_owner }}/charts/mcp-trino:$PACKAGE_VERSION"
+          echo "Helm chart published to ghcr.io/${{ env.REPO_LOWER }}/charts/mcp-trino:$PACKAGE_VERSION"
