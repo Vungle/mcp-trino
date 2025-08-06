@@ -85,15 +85,15 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 	// Return OAuth 2.0 Authorization Server Metadata (RFC 8414)
 	metadata := map[string]interface{}{
 		"issuer":                                fmt.Sprintf("%s", h.config.MCPURL),
-		"authorization_endpoint":                fmt.Sprintf("%s://%s:%s/oauth/authorize", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
-		"token_endpoint":                        fmt.Sprintf("%s://%s:%s/oauth/token", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
-		"registration_endpoint":                 fmt.Sprintf("%s://%s:%s/oauth/register", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
+		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
 		"response_types_supported":              []string{"code"},
 		"response_modes_supported":              []string{"query"},
 		"grant_types_supported":                 []string{"authorization_code", "refresh_token"},
 		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
-		"revocation_endpoint":                   fmt.Sprintf("%s://%s:%s/oauth/revoke", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
+		"revocation_endpoint":                   fmt.Sprintf("%s/oauth/revoke", h.config.MCPURL),
 	}
 
 	// Encode and send response
