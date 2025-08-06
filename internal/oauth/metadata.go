@@ -84,7 +84,7 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 
 	// Return OAuth 2.0 Authorization Server Metadata (RFC 8414)
 	metadata := map[string]interface{}{
-		"issuer":                                fmt.Sprintf("%s://%s:%s", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
+		"issuer":                                fmt.Sprintf("%s", h.config.MCPURL),
 		"authorization_endpoint":                fmt.Sprintf("%s://%s:%s/oauth/authorize", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
 		"token_endpoint":                        fmt.Sprintf("%s://%s:%s/oauth/token", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
 		"registration_endpoint":                 fmt.Sprintf("%s://%s:%s/oauth/register", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
