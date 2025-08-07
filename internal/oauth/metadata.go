@@ -101,16 +101,16 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 
 	// Return OAuth 2.0 Authorization Server Metadata (RFC 8414)
 	metadata := map[string]interface{}{
-		"issuer":                                h.config.Issuer,
-		"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer),
-		"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth2/v1/clients", h.config.Issuer),
+		"issuer":                                h.config.MCPURL,
+		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
 		"response_types_supported":              []string{"code"},
 		"response_modes_supported":              []string{"query"},
 		"grant_types_supported":                 []string{"authorization_code", "refresh_token"},
 		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
-		"revocation_endpoint":                   fmt.Sprintf("%s/oauth/revoke", h.config.Issuer),
+		"revocation_endpoint":                   fmt.Sprintf("%s/oauth/revoke", h.config.MCPURL),
 	}
 
 	// Encode and send response
@@ -145,12 +145,12 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 	// Return OAuth 2.0 Protected Resource Metadata (RFC 9728)
 	metadata := map[string]interface{}{
 		"resource":                              h.config.MCPURL,
-		"authorization_servers":                 []string{fmt.Sprintf("%s://%s:%s", h.config.Scheme, h.config.MCPHost, h.config.MCPPort)},
+		"authorization_servers":                 []string{h.config.MCPURL},
 		"bearer_methods_supported":              []string{"header"},
 		"resource_signing_alg_values_supported": []string{"RS256"},
-		"resource_documentation":                fmt.Sprintf("%s://%s:%s/docs", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
-		"resource_policy_uri":                   fmt.Sprintf("%s://%s:%s/policy", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
-		"resource_tos_uri":                      fmt.Sprintf("%s://%s:%s/tos", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
+		"resource_documentation":                fmt.Sprintf("%s/docs", h.config.MCPURL),
+		"resource_policy_uri":                   fmt.Sprintf("%s/policy", h.config.MCPURL),
+		"resource_tos_uri":                      fmt.Sprintf("%s/tos", h.config.MCPURL),
 	}
 
 	// Encode and send response
