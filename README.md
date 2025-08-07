@@ -93,6 +93,7 @@ graph TB
 - ✅ OAuth 2.0 authentication with OIDC provider support (Okta, Google, Azure AD)
 - ✅ StreamableHTTP support with JWT authentication (upgraded from SSE)
 - ✅ Backward compatibility with SSE endpoints
+- ✅ Comprehensive access logging with structured JSON output
 - ✅ Compatible with Cursor, Claude Desktop, Windsurf, ChatWise, and any MCP-compatible clients.
 
 ## Installation
@@ -890,6 +891,31 @@ The server can be configured using the following environment variables:
 > **OAuth Authentication**: When `TRINO_OAUTH_ENABLED=true`, the server supports multiple OAuth providers including OIDC-compliant providers (Okta, Google, Azure AD) for production use and HMAC mode for development/testing.
 
 > **HTTPS Support**: For production deployments, configure HTTPS by setting `HTTPS_CERT_FILE` and `HTTPS_KEY_FILE` environment variables. This is strongly recommended when using JWT authentication.
+
+## Documentation
+
+### Access Logging
+
+The server includes comprehensive access logging functionality that provides detailed information about all HTTP requests and MCP tool operations. For detailed information about access logging, including log formats, configuration, and analysis tools, see [Access Logging Documentation](docs/access-logging.md).
+
+Key features:
+- Structured JSON logging for all HTTP requests
+- Detailed OAuth request logging with timing
+- MCP tool request/response logging
+- Security-conscious token logging (truncated)
+- Request correlation with unique IDs
+
+### Testing Access Logs
+
+Use the provided test script to generate sample access logs:
+
+```bash
+# Make the script executable
+chmod +x scripts/test_access_logs.sh
+
+# Run the test script
+./scripts/test_access_logs.sh
+```
 
 ## Contributing
 
