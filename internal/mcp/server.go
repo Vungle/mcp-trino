@@ -19,109 +19,6 @@ import (
 	"github.com/tuannvm/mcp-trino/internal/trino"
 )
 
-// AccessLog represents a single access log entry
-type AccessLog struct {
-	Timestamp     time.Time `json:"timestamp"`
-	Method        string    `json:"method"`
-	Path          string    `json:"path"`
-	Query         string    `json:"query"`
-	RemoteAddr    string    `json:"remote_addr"`
-	UserAgent     string    `json:"user_agent"`
-	StatusCode    int       `json:"status_code"`
-	ResponseTime  int64     `json:"response_time_ms"`
-	ContentLength int64     `json:"content_length"`
-	RequestID     string    `json:"request_id"`
-	OAuthToken    string    `json:"oauth_token,omitempty"`
-	Error         string    `json:"error,omitempty"`
-}
-
-// loggingResponseWriter wraps http.ResponseWriter to capture status code and content length
-type loggingResponseWriter struct {
-	http.ResponseWriter
-	statusCode    int
-	contentLength int64
-}
-
-func (lrw *loggingResponseWriter) WriteHeader(statusCode int) {
-	lrw.statusCode = statusCode
-	lrw.ResponseWriter.WriteHeader(statusCode)
-}
-
-func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
-	lrw.contentLength += int64(len(data))
-	return lrw.ResponseWriter.Write(data)
-}
-
-// accessLogMiddleware creates middleware for comprehensive access logging
-func accessLogMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-
-		// Create logging response writer
-		lrw := &loggingResponseWriter{
-			ResponseWriter: w,
-			statusCode:     200, // Default status code
-		}
-
-		// Generate request ID
-		requestID := generateRequestID()
-
-		// Extract OAuth token if present
-		var oauthToken string
-		if authHeader := r.Header.Get("Authorization"); strings.HasPrefix(authHeader, "Bearer ") {
-			token := strings.TrimPrefix(authHeader, "Bearer ")
-			token = strings.TrimSpace(token)
-			if len(token) > 10 {
-				oauthToken = token[:10] + "..." // Log first 10 chars for security
-			} else {
-				oauthToken = token
-			}
-		}
-
-		// Handle the request
-		next.ServeHTTP(lrw, r)
-
-		// Calculate response time
-		responseTime := time.Since(start).Milliseconds()
-
-		// Create access log entry
-		accessLog := AccessLog{
-			Timestamp:     start,
-			Method:        r.Method,
-			Path:          r.URL.Path,
-			Query:         r.URL.RawQuery,
-			RemoteAddr:    r.RemoteAddr,
-			UserAgent:     r.UserAgent(),
-			StatusCode:    lrw.statusCode,
-			ResponseTime:  responseTime,
-			ContentLength: lrw.contentLength,
-			RequestID:     requestID,
-			OAuthToken:    oauthToken,
-		}
-
-		// Log the access entry
-		logAccess(accessLog)
-	})
-}
-
-// generateRequestID generates a unique request ID
-func generateRequestID() string {
-	return fmt.Sprintf("req_%d", time.Now().UnixNano())
-}
-
-// logAccess logs an access log entry
-func logAccess(accessLog AccessLog) {
-	// Convert to JSON for structured logging
-	jsonData, err := json.Marshal(accessLog)
-	if err != nil {
-		log.Printf("Error marshaling access log: %v", err)
-		return
-	}
-
-	// Log with structured format
-	log.Printf("ACCESS_LOG: %s", string(jsonData))
-}
-
 // Server represents the MCP server with all its components
 type Server struct {
 	mcpServer    *mcpserver.MCPServer
@@ -246,12 +143,9 @@ func (s *Server) ServeHTTP(port string) error {
 	// Add SSE endpoint (backward compatibility)
 	mux.HandleFunc("/sse", mcpHandler)
 
-	// Apply access logging middleware to the entire mux
-	handler := accessLogMiddleware(mux)
-
 	httpServer := &http.Server{
 		Addr:    addr,
-		Handler: handler,
+		Handler: mux,
 	}
 
 	// Graceful shutdown
@@ -380,10 +274,6 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 			ctx := contextFunc(r.Context(), r)
 			r = r.WithContext(ctx)
 		}
-
-		// Add HTTP request to context for access logging
-		ctx := context.WithValue(r.Context(), "http_request", r)
-		r = r.WithContext(ctx)
 
 		// Handle MCP request using StreamableHTTP server
 		streamableServer.ServeHTTP(w, r)
