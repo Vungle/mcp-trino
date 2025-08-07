@@ -891,8 +891,6 @@ The server can be configured using the following environment variables:
 
 > **HTTPS Support**: For production deployments, configure HTTPS by setting `HTTPS_CERT_FILE` and `HTTPS_KEY_FILE` environment variables. This is strongly recommended when using JWT authentication.
 
-
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
