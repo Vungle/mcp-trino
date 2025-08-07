@@ -26,6 +26,11 @@ type OAuth2Handler struct {
 	oauth2Config *oauth2.Config
 }
 
+// GetConfig returns the OAuth2 configuration
+func (h *OAuth2Handler) GetConfig() *OAuth2Config {
+	return h.config
+}
+
 // OAuth2Config holds OAuth2 configuration
 type OAuth2Config struct {
 	Enabled     bool

@@ -156,19 +156,20 @@ func (s *Server) ServeHTTP(port string) error {
 		// Check for HTTPS certificates
 		certFile := getEnv("HTTPS_CERT_FILE", "")
 		keyFile := getEnv("HTTPS_KEY_FILE", "")
+		oauth2Config := s.oauthHandler.GetConfig()
 
 		if certFile != "" && keyFile != "" {
 			// Start HTTPS server
 			oauthStatus := s.getOAuthStatus()
 
 			log.Printf("Starting HTTPS server on %s%s", addr, oauthStatus)
-			log.Printf("  - Modern endpoint: https://localhost%s/mcp", addr)
-			log.Printf("  - Legacy endpoint: https://localhost%s/sse (backward compatibility)", addr)
-			log.Printf("  - OAuth metadata: https://localhost%s/.well-known/oauth-authorization-server", addr)
-			log.Printf("  - OAuth metadata (legacy): https://localhost%s/.well-known/oauth-metadata", addr)
+			log.Printf("  - Modern endpoint: %s/mcp", oauth2Config.MCPURL)
+			log.Printf("  - Legacy endpoint: %s/sse (backward compatibility)", oauth2Config.MCPURL)
+			log.Printf("  - OAuth metadata: %s/.well-known/oauth-authorization-server", oauth2Config.MCPURL)
+			log.Printf("  - OAuth metadata (legacy): %s/.well-known/oauth-metadata", oauth2Config.MCPURL)
 			if s.config.OAuthEnabled {
-				log.Printf("  - OAuth callback: https://localhost%s/oauth/callback", addr)
-				log.Printf("  - OAuth callback (Claude Code): https://localhost%s/callback (redirects to /oauth/callback)", addr)
+				log.Printf("  - OAuth callback: %s/oauth/callback", oauth2Config.MCPURL)
+				log.Printf("  - OAuth callback (Claude Code): %s/callback (redirects to /oauth/callback)", oauth2Config.MCPURL)
 			}
 
 			if err := httpServer.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
@@ -179,13 +180,13 @@ func (s *Server) ServeHTTP(port string) error {
 			oauthStatus := s.getOAuthStatusWithWarning()
 
 			log.Printf("Starting HTTP server on %s%s", addr, oauthStatus)
-			log.Printf("  - Modern endpoint: http://localhost%s/mcp", addr)
-			log.Printf("  - Legacy endpoint: http://localhost%s/sse (backward compatibility)", addr)
-			log.Printf("  - OAuth metadata: http://localhost%s/.well-known/oauth-authorization-server", addr)
-			log.Printf("  - OAuth metadata (legacy): http://localhost%s/.well-known/oauth-metadata", addr)
+			log.Printf("  - Modern endpoint: %s/mcp", oauth2Config.MCPURL)
+			log.Printf("  - Legacy endpoint: %s/sse (backward compatibility)", oauth2Config.MCPURL)
+			log.Printf("  - OAuth metadata: %s/.well-known/oauth-authorization-server", oauth2Config.MCPURL)
+			log.Printf("  - OAuth metadata (legacy): %s/.well-known/oauth-metadata", oauth2Config.MCPURL)
 			if s.config.OAuthEnabled {
-				log.Printf("  - OAuth callback: http://localhost%s/oauth/callback", addr)
-				log.Printf("  - OAuth callback (Claude Code): http://localhost%s/callback (redirects to /oauth/callback)", addr)
+				log.Printf("  - OAuth callback: %s/oauth/callback", oauth2Config.MCPURL)
+				log.Printf("  - OAuth callback (Claude Code): %s/callback (redirects to /oauth/callback)", oauth2Config.MCPURL)
 			}
 
 			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
