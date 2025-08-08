@@ -31,16 +31,16 @@ sequenceDiagram
     participant Okta_Server as Okta server<br/>redirectURI
 
     %% Step 1 - Auth to MCP
-    MCP_Client->>MCP_Server: 1.0 request MCP without token
-    MCP_Server-->>MCP_Client: 1.1 return 401 and MCP OAuth URL
-
-    MCP_Client->>MCP_Server: 1.2 request MCP OAuth URL, and redirect to Okta server
+    MCP_Client->>MCP_Server: 1.0 Request MCP without token
+    MCP_Server-->>MCP_Client: 1.1 Return 401 and MCP OAuth URL
+    MCP_Client->>MCP_Server: 1.2 Request MCP OAuth URL
+    MCP_Server-->>MCP_Client: 1.3 Redirect to Okta server
 
     %% Step 2 - request to Okta
-    MCP_Client->>Okta_Server: 2. Redirect auth to Okta
+    MCP_Client->>Okta_Server: 2. Request Okta OAuth API
 
     %% Step 3 - Callback from Okta
-    Okta_Server-->>MCP_Server: 3. callback MCP remote server
+    Okta_Server-->>MCP_Server: 3. Callback MCP remote server
 
     %% Step 4 - Proxy back to client
     MCP_Server-->>MCP_Client: 4. Proxy back to client
