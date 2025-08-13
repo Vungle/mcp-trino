@@ -1,0 +1,57 @@
+{
+  "dxt_version": "0.1",
+  "name": "trino-mcp-remote",
+  "display_name": "Trino MCP Remote",
+  "version": "1.0.0",
+  "description": "Connect to remote Trino MCP server for SQL analytics",
+  "long_description": "This extension connects MCP clients to remote Trino MCP servers using mcp-remote. It provides access to Trino SQL query engine through MCP tools including execute_query, list_catalogs, list_schemas, list_tables, and get_table_schema.",
+  "author": {
+    "name": "MCP Community",
+    "url": "https://github.com/modelcontextprotocol"
+  },
+  "homepage": "https://github.com/tuannvm/mcp-trino",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuannvm/mcp-trino"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "index.js",
+    "mcp_config": {
+      "command": "npx",
+      "args": ["mcp-remote", "${user_config.server_url}", "--debug"],
+      "env": {}
+    }
+  },
+  "user_config": {
+    "server_url": {
+      "type": "string",
+      "title": "Trino MCP Server URL",
+      "description": "The URL of your Trino MCP server endpoint",
+      "default": "https://mcp.trino.vungle.io/mcp",
+      "required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "execute_query",
+      "description": "Execute SQL queries against Trino databases"
+    },
+    {
+      "name": "list_catalogs", 
+      "description": "List available Trino catalogs"
+    },
+    {
+      "name": "list_schemas",
+      "description": "List schemas within a catalog"
+    },
+    {
+      "name": "list_tables",
+      "description": "List tables within a schema"
+    },
+    {
+      "name": "get_table_schema",
+      "description": "Get table structure and column information"
+    }
+  ]
+}

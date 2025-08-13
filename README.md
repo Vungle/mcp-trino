@@ -423,6 +423,50 @@ Alternatively, you can import the local configuration from JSON:
 
 Once enabled, click the hammer icon below the input box in ChatWise to access Trino MCP tools.
 
+## Remote MCP Server via Desktop Extensions (DXT)
+
+For easy one-click installation of remote Trino MCP servers, you can use Desktop Extensions (DXT). This approach allows users to connect to your remote Trino MCP server without local setup.
+
+### Building Custom DXT Extensions
+
+The repository includes a `dxt-remote/` directory with templates for creating DXT extensions that connect to remote Trino MCP servers:
+
+```bash
+# Build DXT with custom server URL
+make dxt URL=https://your-trino-server.com/mcp NAME=your-trino-remote
+
+# Build for different environments
+make dxt-dev      # Uses dev.example.com
+make dxt-staging  # Uses staging.example.com  
+make dxt-prod     # Uses prod.example.com
+```
+
+### DXT Extension Features
+
+- ✅ **One-click installation** for end users
+- ✅ **OAuth authentication support** via mcp-remote
+- ✅ **User-configurable server URL** during installation
+- ✅ **Generic template** - no vendor-specific references
+- ✅ **Compatible with all MCP clients** (Claude Desktop, Cursor, etc.)
+
+### DXT Package Contents
+
+The generated DXT contains:
+- `manifest.json` - Extension configuration with user prompts
+- `index.js` - Required entry point (unused, mcp-remote handles execution)
+- `README.md` - Installation and usage instructions
+
+Users will be prompted to configure their Trino MCP Server URL during installation, with sensible defaults provided.
+
+### DXT vs Direct Installation
+
+| Method | Pros | Cons |
+|--------|------|------|
+| **Local Binary** | Full control, direct connection | Requires manual setup, environment configuration |
+| **DXT Extension** | One-click install, automatic configuration | Requires mcp-remote, OAuth flow needed |
+
+Choose DXT extensions when you want to distribute your remote Trino MCP server to non-technical users who prefer simple installation workflows.
+
 ## Available MCP Tools
 
 The server provides the following MCP tools:
