@@ -1,4 +1,4 @@
-.PHONY: build build-dxt pack-dxt test clean run-dev release-snapshot run-docker run docker-compose-up docker-compose-down lint docker-test
+.PHONY: build build-dxt pack-dxt dxt dxt-build dxt-dev dxt-staging dxt-prod test clean run-dev release-snapshot run-docker run docker-compose-up docker-compose-down lint docker-test
 
 # Variables
 BINARY_NAME=mcp-trino
@@ -27,6 +27,28 @@ pack-dxt: build-dxt
 	dxt pack
 	@echo "DXT package created: $(BINARY_NAME).dxt"
 
+# Build remote DXT extension with custom URL
+dxt:
+	$(MAKE) dxt-build URL=$(URL) NAME=$(NAME)
+
+dxt-build:
+	@echo "Building remote DXT with URL: $(URL)"
+	@echo "Output: $(NAME).dxt"
+	@cd dxt-remote && sed 's|{{SERVER_URL}}|$(URL)|g' manifest.template.json > manifest.json
+	@cd dxt-remote && rm -f $(NAME).dxt
+	@cd dxt-remote && zip -r $(NAME).dxt . -x "*.dxt" "*.template.json" "Makefile" "*.git*"
+	@echo "Built dxt-remote/$(NAME).dxt successfully!"
+
+# Convenience targets for different environments  
+dxt-dev:
+	@$(MAKE) dxt-build URL=https://dev.example.com/mcp NAME=trino-mcp-dev
+
+dxt-staging:
+	@$(MAKE) dxt-build URL=https://staging.example.com/mcp NAME=trino-mcp-staging
+
+dxt-prod:
+	@$(MAKE) dxt-build URL=https://prod.example.com/mcp NAME=trino-mcp-prod
+
 # Run tests
 test:
 	go test ./...
@@ -36,6 +58,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf server
 	rm -f $(BINARY_NAME).dxt $(BINARY_NAME)-*.dxt
+	rm -f dxt-remote/*.dxt dxt-remote/manifest.json
 
 # Run the application in development mode
 run-dev:
