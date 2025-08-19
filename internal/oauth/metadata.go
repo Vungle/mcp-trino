@@ -94,6 +94,11 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 		"revocation_endpoint":                   fmt.Sprintf("%s/oauth/revoke", h.config.MCPURL),
 	}
 
+	// Add redirect URIs for mcp-remote compatibility
+	if h.config.RedirectURI != "" {
+		metadata["redirect_uris"] = []string{h.config.RedirectURI}
+	}
+
 	// Encode and send response
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(metadata); err != nil {
