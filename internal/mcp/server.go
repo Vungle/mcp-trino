@@ -241,6 +241,7 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 					mcpHost,
 					fmt.Sprintf("%s://%s:%s", s.getScheme(), mcpHost, mcpPort)))
 				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("Accept", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 
 				// Return error response that triggers OAuth discovery
