@@ -124,12 +124,10 @@ func OAuthMiddleware(validator TokenValidator, enabled bool) func(server.ToolHan
 				return next(ctx, req)
 			}
 
-			// Log token for debugging (first 50 chars)
-			tokenPreview := tokenString
-			if len(tokenString) > 50 {
-				tokenPreview = tokenString[:50] + "..."
-			}
-			log.Printf("OAuth: Validating token for tool %s: %s", req.Params.Name, tokenPreview)
+			// Log token hash for debugging (prevents sensitive data exposure)
+			tokenHashFull := fmt.Sprintf("%x", sha256.Sum256([]byte(tokenString)))
+			tokenHashPreview := tokenHashFull[:16] + "..."
+			log.Printf("OAuth: Validating token for tool %s (hash: %s)", req.Params.Name, tokenHashPreview)
 
 			// Validate token using configured provider
 			user, err := validator.ValidateToken(tokenString)

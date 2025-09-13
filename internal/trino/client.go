@@ -39,7 +39,9 @@ func NewClient(cfg *config.TrinoConfig) (*Client, error) {
 	// Open a connection
 	db, err := sql.Open("trino", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to Trino: %w", err)
+		// Sanitize error to prevent password exposure
+		sanitizedErr := sanitizeConnectionError(err, cfg.Password)
+		return nil, fmt.Errorf("failed to connect to Trino: %w", sanitizedErr)
 	}
 
 	// Set connection pool parameters
@@ -53,7 +55,9 @@ func NewClient(cfg *config.TrinoConfig) (*Client, error) {
 		if closeErr != nil {
 			log.Printf("Error closing DB connection: %v", closeErr)
 		}
-		return nil, fmt.Errorf("failed to ping Trino: %w", err)
+		// Sanitize error to prevent password exposure
+		sanitizedErr := sanitizeConnectionError(err, cfg.Password)
+		return nil, fmt.Errorf("failed to ping Trino: %w", sanitizedErr)
 	}
 
 	return &Client{
@@ -300,4 +304,25 @@ func (c *Client) ExplainQuery(query string, format string) ([]map[string]interfa
 	explainQuery = fmt.Sprintf("%s %s", explainQuery, query)
 
 	return c.ExecuteQuery(explainQuery)
+}
+
+// sanitizeConnectionError removes sensitive information from connection errors
+func sanitizeConnectionError(err error, password string) error {
+	if err == nil {
+		return err
+	}
+	
+	errStr := err.Error()
+	
+	// Replace password in error message if it exists
+	if password != "" {
+		// Replace URL-encoded password
+		encodedPassword := url.QueryEscape(password)
+		errStr = strings.ReplaceAll(errStr, encodedPassword, "[PASSWORD_REDACTED]")
+		
+		// Replace plain password
+		errStr = strings.ReplaceAll(errStr, password, "[PASSWORD_REDACTED]")
+	}
+	
+	return fmt.Errorf("%s", errStr)
 }

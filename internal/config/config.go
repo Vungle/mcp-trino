@@ -44,7 +44,7 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 	sslInsecure, _ := strconv.ParseBool(getEnv("TRINO_SSL_INSECURE", "true"))
 	scheme := getEnv("TRINO_SCHEME", "https")
 	allowWriteQueries, _ := strconv.ParseBool(getEnv("TRINO_ALLOW_WRITE_QUERIES", "false"))
-	oauthEnabled, _ := strconv.ParseBool(getEnv("TRINO_OAUTH_ENABLED", "false"))
+	oauthEnabled, _ := strconv.ParseBool(getEnv("TRINO_OAUTH_ENABLED", "true"))
 	oauthProvider := strings.ToLower(getEnv("OAUTH_PROVIDER", "hmac"))
 	jwtSecret := getEnv("JWT_SECRET", "")
 	
@@ -92,7 +92,7 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		
 		log.Printf("INFO: OAuth 2.1 authentication enabled (TRINO_OAUTH_ENABLED=true) with provider: %s", oauthProvider)
 		if oauthProvider == "hmac" && jwtSecret == "" {
-			log.Println("WARNING: JWT_SECRET not set for HMAC provider. Using insecure default for development only.")
+			return nil, fmt.Errorf("security error: JWT_SECRET is required when using HMAC provider. Set JWT_SECRET environment variable")
 		}
 		if oauthProvider != "hmac" && oidcIssuer == "" {
 			log.Printf("WARNING: OIDC_ISSUER not set for %s provider. OAuth authentication may fail.", oauthProvider)
@@ -100,6 +100,8 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		if oauthRedirectURI != "" {
 			log.Printf("INFO: Fixed OAuth redirect URI configured: %s", oauthRedirectURI)
 		}
+	} else {
+		log.Println("WARNING: OAuth authentication is disabled (TRINO_OAUTH_ENABLED=false). This is insecure for production use.")
 	}
 
 	return &TrinoConfig{
