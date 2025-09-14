@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -23,6 +24,7 @@ type TokenValidator interface {
 // HMACValidator validates JWT tokens using HMAC-SHA256 (backward compatibility)
 type HMACValidator struct {
 	secret     string
+	audience   string
 	secretOnce sync.Once
 }
 
@@ -32,14 +34,19 @@ type OIDCValidator struct {
 	provider *oidc.Provider
 }
 
-// Initialize sets up the HMAC validator with JWT secret
+// Initialize sets up the HMAC validator with JWT secret and audience
 func (v *HMACValidator) Initialize(cfg *config.TrinoConfig) error {
 	v.secretOnce.Do(func() {
 		v.secret = cfg.JWTSecret
+		v.audience = cfg.OIDCAudience
 	})
 	
 	if v.secret == "" {
 		return fmt.Errorf("JWT_SECRET is required for HMAC provider")
+	}
+	
+	if v.audience == "" {
+		return fmt.Errorf("JWT audience is required for HMAC provider")
 	}
 	
 	return nil
@@ -72,9 +79,14 @@ func (v *HMACValidator) ValidateToken(tokenString string) (*User, error) {
 		return nil, fmt.Errorf("invalid token claims")
 	}
 
-	// Validate required claims
+	// Validate required claims including audience
 	if err := validateTokenClaims(claims); err != nil {
 		return nil, fmt.Errorf("token validation failed: %w", err)
+	}
+	
+	// Validate audience claim for security
+	if err := v.validateAudience(claims); err != nil {
+		return nil, fmt.Errorf("audience validation failed: %w", err)
 	}
 
 	// Extract user information
@@ -89,6 +101,35 @@ func (v *HMACValidator) ValidateToken(tokenString string) (*User, error) {
 	}
 
 	return user, nil
+}
+
+// validateAudience validates the audience claim matches the expected value
+func (v *HMACValidator) validateAudience(claims jwt.MapClaims) error {
+	// Extract audience claim (can be string or []string)
+	audClaim, exists := claims["aud"]
+	if !exists {
+		return fmt.Errorf("missing audience claim")
+	}
+	
+	// Handle string audience
+	if audStr, ok := audClaim.(string); ok {
+		if audStr != v.audience {
+			return fmt.Errorf("invalid audience: expected %s, got %s", v.audience, audStr)
+		}
+		return nil
+	}
+	
+	// Handle array of audiences
+	if audArray, ok := audClaim.([]interface{}); ok {
+		for _, aud := range audArray {
+			if audStr, ok := aud.(string); ok && audStr == v.audience {
+				return nil
+			}
+		}
+		return fmt.Errorf("invalid audience: expected %s not found in audience list", v.audience)
+	}
+	
+	return fmt.Errorf("invalid audience claim type")
 }
 
 // Initialize sets up the OIDC validator with provider discovery
@@ -129,6 +170,8 @@ func (v *OIDCValidator) Initialize(cfg *config.TrinoConfig) error {
 		SkipExpiryCheck:      false, // Verify expiration
 		SkipIssuerCheck:      false, // Verify issuer
 	})
+	
+	log.Printf("OAuth: OIDC validator initialized with audience validation: %s", cfg.OIDCAudience)
 	
 	v.provider = provider
 	v.verifier = verifier
