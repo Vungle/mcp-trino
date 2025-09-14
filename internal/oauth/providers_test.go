@@ -221,13 +221,13 @@ func TestHMACValidator_SecurityValidation(t *testing.T) {
 			t.Fatalf("Failed to initialize validator: %v", err)
 		}
 		
-		// Simulate a token from another Liftoff service (different audience)
+		// Simulate a token from another service (different audience)
 		crossServiceToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"sub": "cross-service-user",
-			"aud": "other.liftoff.service", // Different service audience
+			"aud": "other.service.com", // Different service audience
 			"exp": time.Now().Add(time.Hour).Unix(),
 			"iat": time.Now().Unix(),
-			"iss": "liftoff.okta.com", // Same issuer
+			"iss": "company.okta.com", // Same issuer
 		})
 		
 		tokenString, err := crossServiceToken.SignedString([]byte(cfg.JWTSecret))
