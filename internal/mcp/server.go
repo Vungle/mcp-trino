@@ -156,7 +156,6 @@ func (s *Server) ServeHTTP(port string) error {
 		// Check for HTTPS certificates
 		certFile := getEnv("HTTPS_CERT_FILE", "")
 		keyFile := getEnv("HTTPS_KEY_FILE", "")
-		oauth2Config := s.oauthHandler.GetConfig()
 
 		var oauth2Config *oauth.OAuth2Config
 		if s.oauthHandler != nil {
