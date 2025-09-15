@@ -226,6 +226,18 @@ func TestIsReadOnlyQuery(t *testing.T) {
 			expected: false,
 		},
 
+		// Real write operations that should still be caught
+		{
+			name:     "DELETE after string literal",
+			query:    "SELECT 'test'; DELETE FROM users",
+			expected: false,
+		},
+		{
+			name:     "INSERT with comment",
+			query:    "/* comment */ INSERT INTO users VALUES (1, 'test')",
+			expected: false,
+		},
+
 		// Whitespace bypass attempts (should return false)
 		{
 			name:     "DELETE with tab",
@@ -256,6 +268,58 @@ func TestIsReadOnlyQuery(t *testing.T) {
 			name:     "RESET with multiple spaces",
 			query:    "RESET  SESSION query_max_run_time",
 			expected: false,
+		},
+
+		// False positive tests - should NOT be blocked (string literals and identifiers)
+		{
+			name:     "SELECT with single-quoted string literal",
+			query:    "SELECT 'insert' FROM table_a",
+			expected: true,
+		},
+		{
+			name:     "SELECT with double-quoted identifier",
+			query:    "SELECT \"delete\" FROM table_a",
+			expected: true,
+		},
+		{
+			name:     "SELECT with backtick-quoted identifier",
+			query:    "SELECT `update` FROM table_a",
+			expected: true,
+		},
+		{
+			name:     "SELECT with column name containing write keyword",
+			query:    "SELECT insert_date FROM logs",
+			expected: true,
+		},
+		{
+			name:     "SELECT with table name containing write keyword",
+			query:    "SELECT * FROM insert_logs",
+			expected: true,
+		},
+		{
+			name:     "SELECT with escaped single quotes",
+			query:    "SELECT 'don''t delete this' FROM table_a",
+			expected: true,
+		},
+		{
+			name:     "SELECT with escaped double quotes",
+			query:    "SELECT \"column\"\"with\"\"drop\" FROM table_a",
+			expected: true,
+		},
+		{
+			name:     "SELECT with single-line comment containing write keyword",
+			query:    "SELECT * FROM users -- insert comment",
+			expected: true,
+		},
+		{
+			name:     "SELECT with multi-line comment containing write keyword",
+			query:    "SELECT * FROM users /* delete this comment */",
+			expected: true,
+		},
+		{
+			name:     "Complex query with multiple string literals",
+			query:    "SELECT 'insert', \"update\", `delete` FROM table WHERE col = 'drop'",
+			expected: true,
 		},
 	}
 

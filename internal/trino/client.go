@@ -83,6 +83,9 @@ func isReadOnlyQuery(query string) bool {
 	queryLower = strings.ReplaceAll(queryLower, "\n", " ")
 	queryLower = strings.ReplaceAll(queryLower, "\r", " ")
 
+	// Remove string literals and comments to avoid false positives
+	queryLower = sanitizeQueryForKeywordDetection(queryLower)
+
 	// Ensure there's at least one space after keywords for proper prefix matching
 	if strings.HasPrefix(queryLower, "select") && !strings.HasPrefix(queryLower, "select ") {
 		queryLower = "select " + queryLower[6:]
@@ -135,6 +138,29 @@ func isReadOnlyQuery(query string) bool {
 	}
 
 	return false
+}
+
+// sanitizeQueryForKeywordDetection removes string literals, quoted identifiers, and comments
+// to prevent false positives when detecting write operations
+func sanitizeQueryForKeywordDetection(query string) string {
+	// Remove single-quoted string literals: 'text'
+	// Handle escaped quotes: 'don''t' becomes 'don''t'
+	query = regexp.MustCompile(`'(?:[^']|'')*'`).ReplaceAllString(query, "'LITERAL'")
+
+	// Remove double-quoted identifiers: "column_name"
+	// Handle escaped quotes: "column""name" becomes "column""name"
+	query = regexp.MustCompile(`"(?:[^"]|"")*"`).ReplaceAllString(query, "\"IDENTIFIER\"")
+
+	// Remove backtick-quoted identifiers: `column_name`
+	query = regexp.MustCompile("`[^`]*`").ReplaceAllString(query, "`IDENTIFIER`")
+
+	// Remove single-line comments: -- comment
+	query = regexp.MustCompile(`--[^\r\n]*`).ReplaceAllString(query, "")
+
+	// Remove multi-line comments: /* comment */
+	query = regexp.MustCompile(`/\*[^*]*\*+(?:[^/*][^*]*\*+)*/`).ReplaceAllString(query, "")
+
+	return strings.TrimSpace(query)
 }
 
 // ExecuteQuery executes a SQL query and returns the results
