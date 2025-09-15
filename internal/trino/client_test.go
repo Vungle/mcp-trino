@@ -168,6 +168,95 @@ func TestIsReadOnlyQuery(t *testing.T) {
 			query:    "SELECT * FROM users WHERE id IN (DELETE FROM inactive_users RETURNING user_id)",
 			expected: false,
 		},
+
+		// New write operations (should return false)
+		{
+			name:     "MERGE query",
+			query:    "MERGE INTO target USING source ON target.id = source.id",
+			expected: false,
+		},
+		{
+			name:     "COPY query",
+			query:    "COPY table FROM 's3://bucket/data.csv'",
+			expected: false,
+		},
+		{
+			name:     "GRANT query",
+			query:    "GRANT SELECT ON table TO user",
+			expected: false,
+		},
+		{
+			name:     "REVOKE query",
+			query:    "REVOKE SELECT ON table FROM user",
+			expected: false,
+		},
+		{
+			name:     "COMMIT query",
+			query:    "COMMIT",
+			expected: false,
+		},
+		{
+			name:     "ROLLBACK query",
+			query:    "ROLLBACK",
+			expected: false,
+		},
+		{
+			name:     "CALL query",
+			query:    "CALL some_procedure()",
+			expected: false,
+		},
+		{
+			name:     "EXECUTE query",
+			query:    "EXECUTE prepared_statement",
+			expected: false,
+		},
+		{
+			name:     "REFRESH query",
+			query:    "REFRESH MATERIALIZED VIEW view_name",
+			expected: false,
+		},
+		{
+			name:     "SET SESSION query",
+			query:    "SET SESSION query_max_run_time = '1h'",
+			expected: false,
+		},
+		{
+			name:     "RESET SESSION query",
+			query:    "RESET SESSION query_max_run_time",
+			expected: false,
+		},
+
+		// Whitespace bypass attempts (should return false)
+		{
+			name:     "DELETE with tab",
+			query:    "DELETE\tFROM users",
+			expected: false,
+		},
+		{
+			name:     "UPDATE with multiple spaces",
+			query:    "UPDATE  users SET active = false",
+			expected: false,
+		},
+		{
+			name:     "INSERT with newline",
+			query:    "INSERT\nINTO users VALUES (1, 'test')",
+			expected: false,
+		},
+		{
+			name:     "MERGE with tab",
+			query:    "MERGE\tINTO target USING source",
+			expected: false,
+		},
+		{
+			name:     "DROP with carriage return",
+			query:    "DROP\rTABLE users",
+			expected: false,
+		},
+		{
+			name:     "RESET with multiple spaces",
+			query:    "RESET  SESSION query_max_run_time",
+			expected: false,
+		},
 	}
 
 	for _, tt := range tests {

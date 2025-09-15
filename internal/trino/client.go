@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -104,13 +105,19 @@ func isReadOnlyQuery(query string) bool {
 		return false
 	}
 
-	// Check for write operations anywhere in the query
+	// Check for write operations anywhere in the query using word boundaries
+	//  - https://trino.io/docs/current/sql.html - Main SQL reference
 	writeOperations := []string{
-		"insert ", "update ", "delete ", "drop ", "create ", "alter ", "truncate ",
+		"insert", "update", "delete", "drop", "create", "alter", "truncate",
+		"merge", "copy", "grant", "revoke", "commit", "rollback",
+		"call", "execute", "refresh", "set", "reset",
 	}
 
 	for _, op := range writeOperations {
-		if strings.Contains(queryLower, op) {
+		// Use word boundary regex to catch operations followed by any whitespace
+		pattern := fmt.Sprintf(`\b%s\b`, regexp.QuoteMeta(op))
+		matched, _ := regexp.MatchString(pattern, queryLower)
+		if matched {
 			return false
 		}
 	}
@@ -311,18 +318,18 @@ func sanitizeConnectionError(err error, password string) error {
 	if err == nil {
 		return err
 	}
-	
+
 	errStr := err.Error()
-	
+
 	// Replace password in error message if it exists
 	if password != "" {
 		// Replace URL-encoded password
 		encodedPassword := url.QueryEscape(password)
 		errStr = strings.ReplaceAll(errStr, encodedPassword, "[PASSWORD_REDACTED]")
-		
+
 		// Replace plain password
 		errStr = strings.ReplaceAll(errStr, password, "[PASSWORD_REDACTED]")
 	}
-	
+
 	return fmt.Errorf("%s", errStr)
 }
