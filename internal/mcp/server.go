@@ -163,7 +163,8 @@ func (s *Server) ServeHTTP(port string) error {
 		} else {
 			mcpHost := getEnv("MCP_HOST", "localhost")
 			mcpPort := getEnv("MCP_PORT", "8080")
-			mcpURL := getEnv("MCP_URL", fmt.Sprintf("http://%s:%s", mcpHost, mcpPort))
+			scheme := s.getScheme()
+			mcpURL := getEnv("MCP_URL", fmt.Sprintf("%s://%s:%s", scheme, mcpHost, mcpPort))
 			oauth2Config = &oauth.OAuth2Config{
 				MCPURL: mcpURL,
 			}

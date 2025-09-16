@@ -131,13 +131,14 @@ func discoverOIDCEndpoints(issuer string) (oauth2.Endpoint, error) {
 func NewOAuth2ConfigFromTrinoConfig(trinoConfig *config.TrinoConfig, version string) *OAuth2Config {
 	mcpHost := getEnv("MCP_HOST", "localhost")
 	mcpPort := getEnv("MCP_PORT", "8080")
-	mcpURL := getEnv("MCP_URL", "http://localhost:8080")
 
 	// Determine scheme based on HTTPS configuration
 	scheme := "http"
 	if getEnv("HTTPS_CERT_FILE", "") != "" && getEnv("HTTPS_KEY_FILE", "") != "" {
 		scheme = "https"
 	}
+
+	mcpURL := getEnv("MCP_URL", fmt.Sprintf("%s://%s:%s", scheme, mcpHost, mcpPort))
 
 	return &OAuth2Config{
 		Enabled:      trinoConfig.OAuthEnabled,
