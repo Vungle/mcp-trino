@@ -156,7 +156,18 @@ func (s *Server) ServeHTTP(port string) error {
 		// Check for HTTPS certificates
 		certFile := getEnv("HTTPS_CERT_FILE", "")
 		keyFile := getEnv("HTTPS_KEY_FILE", "")
-		oauth2Config := s.oauthHandler.GetConfig()
+
+		var oauth2Config *oauth.OAuth2Config
+		if s.oauthHandler != nil {
+			oauth2Config = s.oauthHandler.GetConfig()
+		} else {
+			mcpHost := getEnv("MCP_HOST", "localhost")
+			mcpPort := getEnv("MCP_PORT", "8080")
+			mcpURL := getEnv("MCP_URL", fmt.Sprintf("http://%s:%s", mcpHost, mcpPort))
+			oauth2Config = &oauth.OAuth2Config{
+				MCPURL: mcpURL,
+			}
+		}
 
 		if certFile != "" && keyFile != "" {
 			// Start HTTPS server
