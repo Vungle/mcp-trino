@@ -153,6 +153,52 @@ You can download pre-built binaries for your platform:
 
 Or see all available downloads on the [GitHub Releases](https://github.com/tuannvm/mcp-trino/releases) page.
 
+## Usage
+
+### Local Development/Testing (No Authentication)
+
+For local testing and development, the server runs without authentication by default:
+
+```bash
+# Set Trino connection details
+export TRINO_HOST=localhost
+export TRINO_PORT=8080
+export TRINO_USER=trino
+
+# Run without authentication (default)
+mcp-trino
+```
+
+This mode is suitable for:
+- Local development and testing
+- Proof-of-concept setups
+- Environments where network security provides sufficient protection
+
+### Production/Enterprise (OAuth Authentication)
+
+For production deployments, OAuth is automatically enabled when you set an `OAUTH_PROVIDER`:
+
+```bash
+# OAuth automatically enabled when provider is set
+export OAUTH_PROVIDER=okta
+export OIDC_ISSUER=https://your-domain.okta.com
+export OIDC_AUDIENCE=your-service-audience
+export MCP_TRANSPORT=http
+
+# Run with authentication (OAuth auto-enabled)
+mcp-trino
+```
+
+**Smart OAuth Detection:**
+- Setting `OAUTH_PROVIDER` automatically enables OAuth (`TRINO_OAUTH_ENABLED=true`)
+- You can still explicitly disable with `TRINO_OAUTH_ENABLED=false` if needed
+- No provider set = OAuth disabled by default (suitable for local testing)
+
+This mode provides:
+- JWT audience validation to prevent cross-service token reuse
+- Support for OIDC providers (Okta, Google, Azure AD)
+- Enterprise-grade security for production deployments
+
 ### Installation Troubleshooting
 
 If you encounter issues during installation:
@@ -703,7 +749,7 @@ The server supports two transport methods:
    export TRINO_OAUTH_ENABLED=true
    export OAUTH_PROVIDER=okta
    export OIDC_ISSUER=https://your-domain.okta.com
-   export OIDC_AUDIENCE=https://your-domain.okta.com
+   export OIDC_AUDIENCE=your-service-audience
    export MCP_TRANSPORT=http
    mcp-trino
    ```
@@ -839,6 +885,10 @@ docker run -d -p 8080:8080 \
 
 ### Security Considerations
 
+- **JWT Audience Validation**: The server enforces JWT audience claims to prevent cross-service token reuse
+  - Audience must be explicitly configured via `OIDC_AUDIENCE` environment variable
+  - Tokens must include the correct audience claim to be accepted
+  - Prevents unauthorized access from other services using the same OAuth provider
 - **JWT Token Management**: Implement proper token rotation and validation
 - **Network Security**: Use HTTPS in production and consider network-level security
 - **Access Control**: Implement proper authentication and authorization mechanisms
@@ -916,11 +966,11 @@ The server can be configured using the following environment variables:
 | MCP_PORT               | HTTP port for http transport      | 8080      |
 | MCP_HOST               | Host for HTTP callbacks           | localhost |
 | MCP_URL                | Public base URL of MCP server (used for OAuth metadata and client discovery); required for remote deployments | http://localhost:8080 |
-| TRINO_OAUTH_ENABLED    | Enable OAuth authentication       | false     |
-| OAUTH_PROVIDER         | OAuth provider (hmac/okta/google/azure) | hmac   |
+| TRINO_OAUTH_ENABLED    | Enable OAuth authentication (auto-enabled when OAUTH_PROVIDER is set) | false |
+| OAUTH_PROVIDER         | OAuth provider (hmac/okta/google/azure) - setting this enables OAuth | (empty) |
 | JWT_SECRET             | JWT secret for HMAC mode          | (empty)   |
 | OIDC_ISSUER            | OIDC provider issuer URL          | (empty)   |
-| OIDC_AUDIENCE          | OIDC audience identifier           | (empty)   |
+| OIDC_AUDIENCE          | OIDC audience identifier (required for OIDC providers) | (empty - must be set) |
 | OIDC_CLIENT_ID         | OIDC client ID                     | (empty)   |
 | HTTPS_CERT_FILE        | Path to HTTPS certificate file    | (empty)   |
 | HTTPS_KEY_FILE         | Path to HTTPS private key file    | (empty)   |

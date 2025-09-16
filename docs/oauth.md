@@ -65,13 +65,16 @@ sequenceDiagram
 - **Validation**: Shared secret validation
 - **Configuration**: `OAUTH_PROVIDER=hmac`
 
-### 3. No Authentication Mode (Default)
+### 3. No Authentication Mode (Requires Explicit Configuration)
 - **Use Case**: Local development and trusted environments
-- **Configuration**: `TRINO_OAUTH_ENABLED=false`
+- **Configuration**: `TRINO_OAUTH_ENABLED=false` (explicitly required)
 
 ## Key Features
 
 ### Security Implementation
+- **Token Logging**: JWT tokens logged as SHA256 hashes to prevent sensitive data exposure
+- **JWT Secret Enforcement**: Server fails to start without JWT_SECRET in HMAC mode
+- **Connection Error Sanitization**: Database passwords removed from error messages
 - **Token Caching**: SHA256-based token validation caching (5-minute expiration)
 - **PKCE Support**: Full OAuth 2.1 PKCE implementation for public clients
 - **TLS Security**: Secure HTTP client configuration with proper certificate validation
@@ -94,10 +97,10 @@ sequenceDiagram
 ### Environment Variables
 
 ```bash
-# OAuth Configuration
-TRINO_OAUTH_ENABLED=true
+# OAuth Configuration (OAuth enabled by default)
+TRINO_OAUTH_ENABLED=true     # Default: true (secure by default)
 OAUTH_PROVIDER=okta          # hmac|okta|google|azure
-JWT_SECRET=your-secret-key   # Required for HMAC mode
+JWT_SECRET=your-secret-key   # REQUIRED for HMAC mode (server fails without it)
 
 # OIDC Provider Configuration
 OIDC_ISSUER=https://your-domain.okta.com
@@ -118,10 +121,15 @@ HTTPS_KEY_FILE=/path/to/key.pem
 
 ### Development Setup
 ```bash
-# HMAC mode for testing
+# HMAC mode for testing (JWT_SECRET required)
 TRINO_OAUTH_ENABLED=true \
 OAUTH_PROVIDER=hmac \
 JWT_SECRET=development-secret \
+MCP_TRANSPORT=http \
+./mcp-trino
+
+# Insecure mode (explicit opt-out)
+TRINO_OAUTH_ENABLED=false \
 MCP_TRANSPORT=http \
 ./mcp-trino
 ```
@@ -164,6 +172,10 @@ HTTPS_KEY_FILE=/etc/ssl/private/server.key \
 
 ## Security Considerations
 
+- **Secure by Default**: OAuth enabled by default, requires explicit opt-out
+- **JWT Secret Enforcement**: Server prevents startup without proper JWT secrets
+- **Token Security**: JWT tokens logged as hashes to prevent exposure
+- **Connection Security**: Database passwords sanitized from error messages
 - **Token Validation**: Proper JWT signature verification with JWKS
 - **HTTPS Required**: Production deployments must use HTTPS
 - **Token Expiration**: Implement appropriate token lifetimes
