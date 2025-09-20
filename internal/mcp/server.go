@@ -2,7 +2,6 @@ package mcp
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -260,12 +259,7 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="%s", authorization_uri="%s/.well-known/oauth-authorization-server"`,
 					mcpURL,
 					mcpURL))
-				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-
-				// Return OAuth metadata at root level for mcp-remote 0.1.19+ compatibility
-				response := s.oauthHandler.GetAuthorizationServerMetadata()
-				_ = json.NewEncoder(w).Encode(response)
 				return
 			}
 
