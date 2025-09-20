@@ -136,6 +136,11 @@ func (s *Server) ServeHTTP(port string) error {
 		// Add /callback redirect for Claude Code compatibility
 		mux.HandleFunc("/callback", s.oauthHandler.HandleCallbackRedirect)
 
+		// Add OAuth discovery endpoints at /mcp path for mcp-remote 0.1.19+ compatibility
+		// mcp-remote incorrectly appends /.well-known/* to the full MCP endpoint URL
+		mux.HandleFunc("/mcp/.well-known/oauth-authorization-server", s.oauthHandler.HandleAuthorizationServerMetadata)
+		mux.HandleFunc("/mcp/.well-known/openid_configuration", s.oauthHandler.HandleOIDCDiscovery)
+
 	}
 
 	// Shared MCP handler function for both endpoints
