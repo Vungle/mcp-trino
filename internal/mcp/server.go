@@ -259,28 +259,8 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 
-				// Return error response that triggers OAuth discovery
-				response := map[string]interface{}{
-					"jsonrpc": "2.0",
-					"id":      nil,
-					"error": map[string]interface{}{
-						"code":    -32600,
-						"message": "Invalid Request",
-						"data": map[string]interface{}{
-							"oauth": map[string]interface{}{
-								"issuer":                                s.oauthHandler.GetConfig().Issuer,
-								"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", s.oauthHandler.GetConfig().Issuer),
-								"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", s.oauthHandler.GetConfig().Issuer),
-								"registration_endpoint":                 fmt.Sprintf("%s/oauth2/v1/clients", s.oauthHandler.GetConfig().Issuer),
-								"response_types_supported":              []string{"code"},
-								"response_modes_supported":              []string{"query"},
-								"grant_types_supported":                 []string{"authorization_code", "refresh_token"},
-								"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
-								"code_challenge_methods_supported":      []string{"plain", "S256"},
-							},
-						},
-					},
-				}
+				// Return OAuth metadata at root level for mcp-remote 0.1.19+ compatibility
+				response := s.oauthHandler.GetAuthorizationServerMetadata()
 				_ = json.NewEncoder(w).Encode(response)
 				return
 			}
