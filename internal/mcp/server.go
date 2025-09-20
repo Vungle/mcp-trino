@@ -249,13 +249,12 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				// Return 401 with OAuth discovery information
 				log.Printf("OAuth: No bearer token provided, returning 401 with discovery info")
 
-				// Use MCP server host/port, not Trino
-				mcpHost := getEnv("MCP_HOST", "localhost")
-				mcpPort := getEnv("MCP_PORT", "8080")
+				// Use consistent MCP URL from OAuth handler configuration
+				mcpURL := s.oauthHandler.GetConfig().MCPURL
 
 				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="%s", authorization_uri="%s/.well-known/oauth-authorization-server"`,
-					mcpHost,
-					fmt.Sprintf("%s://%s:%s", s.getScheme(), mcpHost, mcpPort)))
+					mcpURL,
+					mcpURL))
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 
