@@ -117,6 +117,9 @@ func (s *Server) ServeHTTP(port string) error {
 
 	// Add OAuth metadata endpoints for MCP compliance
 	if s.config.OAuthEnabled && s.oauthHandler != nil {
+		// OIDC Discovery endpoint (RFC 8414) - required for MCP clients (Claude Code, Desktop, claude.ai)
+		mux.HandleFunc("/.well-known/openid_configuration", s.oauthHandler.HandleOIDCDiscovery)
+
 		// RFC 8414: OAuth 2.0 Authorization Server Metadata
 		mux.HandleFunc("/.well-known/oauth-authorization-server", s.oauthHandler.HandleAuthorizationServerMetadata)
 		// RFC 9728: OAuth 2.0 Protected Resource Metadata
@@ -132,6 +135,7 @@ func (s *Server) ServeHTTP(port string) error {
 
 		// Add /callback redirect for Claude Code compatibility
 		mux.HandleFunc("/callback", s.oauthHandler.HandleCallbackRedirect)
+
 	}
 
 	// Shared MCP handler function for both endpoints
