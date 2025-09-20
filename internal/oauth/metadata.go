@@ -238,7 +238,8 @@ func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Reque
 		metadata["id_token_signing_alg_values_supported"] = []string{"HS256"}
 	case "okta", "google", "azure":
 		metadata["id_token_signing_alg_values_supported"] = []string{"RS256"}
-		metadata["jwks_uri"] = fmt.Sprintf("%s/.well-known/jwks.json", h.config.MCPURL)
+		// TODO: Implement /.well-known/jwks.json endpoint before advertising jwks_uri
+		// metadata["jwks_uri"] = fmt.Sprintf("%s/.well-known/jwks.json", h.config.MCPURL)
 	}
 
 	log.Printf("OAuth2: Returning OIDC discovery metadata for issuer: %s", h.config.MCPURL)
