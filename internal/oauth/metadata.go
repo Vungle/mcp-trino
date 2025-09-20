@@ -88,22 +88,7 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 	}
 
 	// Return OAuth 2.0 Authorization Server Metadata (RFC 8414)
-	metadata := map[string]interface{}{
-		"issuer":                                h.config.MCPURL,
-		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
-		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
-		"response_types_supported":              []string{"code"},
-		"response_modes_supported":              []string{"query"},
-		"grant_types_supported":                 []string{"authorization_code"},
-		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
-		"code_challenge_methods_supported":      []string{"plain", "S256"},
-	}
-
-	// Add redirect URIs for mcp-remote compatibility
-	if h.config.RedirectURI != "" {
-		metadata["redirect_uris"] = []string{h.config.RedirectURI}
-	}
+	metadata := h.GetAuthorizationServerMetadata()
 
 	// Encode and send response
 	w.WriteHeader(http.StatusOK)
@@ -249,4 +234,26 @@ func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Reque
 		log.Printf("OAuth2: Error encoding OIDC discovery metadata: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
+}
+
+// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata
+func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} {
+	metadata := map[string]interface{}{
+		"issuer":                                h.config.MCPURL,
+		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+		"response_types_supported":              []string{"code"},
+		"response_modes_supported":              []string{"query"},
+		"grant_types_supported":                 []string{"authorization_code"},
+		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
+		"code_challenge_methods_supported":      []string{"plain", "S256"},
+	}
+
+	// Add redirect URIs for mcp-remote compatibility
+	if h.config.RedirectURI != "" {
+		metadata["redirect_uris"] = []string{h.config.RedirectURI}
+	}
+
+	return metadata
 }
