@@ -251,7 +251,7 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 		if s.config.OAuthEnabled {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				// Return 401 with OAuth discovery information in Atlassian-compatible format
+				// Return 401 with OAuth discovery information
 				log.Printf("OAuth: No bearer token provided, returning 401 with discovery info")
 
 				// Use consistent MCP URL from OAuth handler configuration
