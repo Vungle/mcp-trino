@@ -172,7 +172,7 @@ func (v *OIDCValidator) Initialize(cfg *config.TrinoConfig) error {
 	
 	// Configure token verifier with required validation settings
 	verifier := provider.Verifier(&oidc.Config{
-		ClientID:             cfg.OIDCClientID,
+		ClientID:             cfg.OIDCAudience, // Note: go-oidc uses ClientID field for audience validation - see https://github.com/coreos/go-oidc/blob/v3/oidc/verify.go#L85
 		SupportedSigningAlgs: []string{oidc.RS256, oidc.ES256},
 		SkipClientIDCheck:    false, // Always validate if ClientID is provided
 		SkipExpiryCheck:      false, // Verify expiration

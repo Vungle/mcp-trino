@@ -113,10 +113,13 @@ func (s *Server) ServeHTTP(port string) error {
 	mux := http.NewServeMux()
 
 	// Add status endpoint
-	mux.HandleFunc("/", s.handleStatus)
+	mux.HandleFunc("/status", s.handleStatus)
 
 	// Add OAuth metadata endpoints for MCP compliance
 	if s.config.OAuthEnabled && s.oauthHandler != nil {
+		// OIDC Discovery endpoint (RFC 8414) - required for MCP clients (Claude Code, Desktop, claude.ai)
+		mux.HandleFunc("/.well-known/openid_configuration", s.oauthHandler.HandleOIDCDiscovery)
+
 		// RFC 8414: OAuth 2.0 Authorization Server Metadata
 		mux.HandleFunc("/.well-known/oauth-authorization-server", s.oauthHandler.HandleAuthorizationServerMetadata)
 		// RFC 9728: OAuth 2.0 Protected Resource Metadata
@@ -132,6 +135,12 @@ func (s *Server) ServeHTTP(port string) error {
 
 		// Add /callback redirect for Claude Code compatibility
 		mux.HandleFunc("/callback", s.oauthHandler.HandleCallbackRedirect)
+
+		// Add OAuth discovery endpoints at /mcp path for mcp-remote 0.1.19+ compatibility
+		// mcp-remote incorrectly appends /.well-known/* to the full MCP endpoint URL
+		mux.HandleFunc("/mcp/.well-known/oauth-authorization-server", s.oauthHandler.HandleAuthorizationServerMetadata)
+		mux.HandleFunc("/mcp/.well-known/openid_configuration", s.oauthHandler.HandleOIDCDiscovery)
+
 	}
 
 	// Shared MCP handler function for both endpoints
@@ -245,39 +254,21 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				// Return 401 with OAuth discovery information
 				log.Printf("OAuth: No bearer token provided, returning 401 with discovery info")
 
-				// Use MCP server host/port, not Trino
-				mcpHost := getEnv("MCP_HOST", "localhost")
-				mcpPort := getEnv("MCP_PORT", "8080")
+				// Use consistent MCP URL from OAuth handler configuration
+				mcpURL := s.oauthHandler.GetConfig().MCPURL
 
-				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="%s", authorization_uri="%s/.well-known/oauth-authorization-server"`,
-					mcpHost,
-					fmt.Sprintf("%s://%s:%s", s.getScheme(), mcpHost, mcpPort)))
+				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="OAuth", error="invalid_token", error_description="Missing or invalid access token", authorization_uri="%s/.well-known/oauth-authorization-server"`,
+					mcpURL))
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 
-				// Return error response that triggers OAuth discovery
-				response := map[string]interface{}{
-					"jsonrpc": "2.0",
-					"id":      nil,
-					"error": map[string]interface{}{
-						"code":    -32600,
-						"message": "Invalid Request",
-						"data": map[string]interface{}{
-							"oauth": map[string]interface{}{
-								"issuer":                                s.oauthHandler.GetConfig().Issuer,
-								"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", s.oauthHandler.GetConfig().Issuer),
-								"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", s.oauthHandler.GetConfig().Issuer),
-								"registration_endpoint":                 fmt.Sprintf("%s/oauth2/v1/clients", s.oauthHandler.GetConfig().Issuer),
-								"response_types_supported":              []string{"code"},
-								"response_modes_supported":              []string{"query"},
-								"grant_types_supported":                 []string{"authorization_code", "refresh_token"},
-								"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
-								"code_challenge_methods_supported":      []string{"plain", "S256"},
-							},
-						},
-					},
+				errorResponse := map[string]string{
+					"error":             "invalid_token",
+					"error_description": "Missing or invalid access token",
 				}
-				_ = json.NewEncoder(w).Encode(response)
+				if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+					log.Printf("Error encoding OAuth error response: %v", err)
+				}
 				return
 			}
 

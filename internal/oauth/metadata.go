@@ -39,8 +39,15 @@ func (h *OAuth2Handler) HandleMetadata(w http.ResponseWriter, r *http.Request) {
 		"mcp_version":            "1.0.0",
 		"server_version":         h.config.Version,
 		"provider":               h.config.Provider,
-		"authorization_endpoint": fmt.Sprintf("%s://%s:%s/oauth/authorize", h.config.Scheme, h.config.MCPHost, h.config.MCPPort),
-		"token_endpoint":         h.oauth2Config.Endpoint.TokenURL,
+
+		// Add OIDC discovery fields for MCP client compatibility
+		"issuer":                   h.config.MCPURL,
+		"authorization_endpoint":   fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":          fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":    fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+		"response_types_supported": []string{"code"},
+		"response_modes_supported": []string{"query"},
+		"grant_types_supported":    []string{"authorization_code"},
 	}
 
 	// Add provider-specific metadata
@@ -74,30 +81,25 @@ func (h *OAuth2Handler) HandleMetadata(w http.ResponseWriter, r *http.Request) {
 func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=300") // Cache for 5 minutes
+	// Add CORS headers for browser-based MCP clients like MCP Inspector
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, *")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 
-	if r.Method != "GET" {
+	switch r.Method {
+	case "OPTIONS", "HEAD":
+		w.WriteHeader(http.StatusOK)
+		return
+	case "GET":
+		// Continue to metadata response
+	default:
 		http.Error(w, `{"error":"Method not allowed"}`, http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Return OAuth 2.0 Authorization Server Metadata (RFC 8414)
-	metadata := map[string]interface{}{
-		"issuer":                                h.config.MCPURL,
-		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
-		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
-		"response_types_supported":              []string{"code"},
-		"response_modes_supported":              []string{"query"},
-		"grant_types_supported":                 []string{"authorization_code", "refresh_token"},
-		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
-		"code_challenge_methods_supported":      []string{"plain", "S256"},
-		"revocation_endpoint":                   fmt.Sprintf("%s/oauth/revoke", h.config.MCPURL),
-	}
-
-	// Add redirect URIs for mcp-remote compatibility
-	if h.config.RedirectURI != "" {
-		metadata["redirect_uris"] = []string{h.config.RedirectURI}
-	}
+	metadata := h.GetAuthorizationServerMetadata()
 
 	// Encode and send response
 	w.WriteHeader(http.StatusOK)
@@ -138,6 +140,17 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 
 // HandleRegister handles OAuth dynamic client registration for mcp-remote
 func (h *OAuth2Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
+	// Add CORS headers for browser-based MCP clients
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, *")
+	w.Header().Set("Access-Control-Max-Age", "86400")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -192,4 +205,77 @@ func (h *OAuth2Handler) HandleCallbackRedirect(w http.ResponseWriter, r *http.Re
 		redirectURL += "?" + r.URL.RawQuery
 	}
 	http.Redirect(w, r, redirectURL, http.StatusFound)
+}
+
+// HandleOIDCDiscovery handles the OIDC discovery endpoint for MCP client compatibility
+func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=300")
+
+	if r.Method != "GET" {
+		http.Error(w, `{"error":"Method not allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	log.Printf("OAuth2: OIDC discovery request from %s", r.RemoteAddr)
+
+	// Return OIDC Discovery metadata with existing /oauth/ endpoints
+	metadata := map[string]interface{}{
+		"issuer":                     h.config.MCPURL,
+		"authorization_endpoint":     fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":            fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":      fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+		"response_types_supported":   []string{"code"},
+		"response_modes_supported":   []string{"query"},
+		"grant_types_supported":      []string{"authorization_code"},
+		"token_endpoint_auth_methods_supported": []string{"none"},
+		"code_challenge_methods_supported":      []string{"plain", "S256"},
+		"subject_types_supported":    []string{"public"},
+		"scopes_supported":          []string{"openid", "profile", "email"},
+	}
+
+	// Add provider-specific fields
+	if h.config.Audience != "" {
+		metadata["audience"] = h.config.Audience
+	}
+
+	// Add provider-specific signing algorithm information
+	switch h.config.Provider {
+	case "hmac":
+		metadata["id_token_signing_alg_values_supported"] = []string{"HS256"}
+	case "okta", "google", "azure":
+		metadata["id_token_signing_alg_values_supported"] = []string{"RS256"}
+		// TODO: Implement /.well-known/jwks.json endpoint before advertising jwks_uri
+		// metadata["jwks_uri"] = fmt.Sprintf("%s/.well-known/jwks.json", h.config.MCPURL)
+	}
+
+	log.Printf("OAuth2: Returning OIDC discovery metadata for issuer: %s", h.config.MCPURL)
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(metadata); err != nil {
+		log.Printf("OAuth2: Error encoding OIDC discovery metadata: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+}
+
+// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata
+func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} {
+	metadata := map[string]interface{}{
+		"issuer":                                h.config.MCPURL,
+		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+		"response_types_supported":              []string{"code"},
+		"response_modes_supported":              []string{"query"},
+		"grant_types_supported":                 []string{"authorization_code"},
+		"token_endpoint_auth_methods_supported": []string{"none"},
+		"code_challenge_methods_supported":      []string{"plain", "S256"},
+	}
+
+	// Add redirect URIs for mcp-remote compatibility
+	if h.config.RedirectURI != "" {
+		metadata["redirect_uris"] = []string{h.config.RedirectURI}
+	}
+
+	return metadata
 }
