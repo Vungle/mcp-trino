@@ -411,22 +411,29 @@ func (h *OAuth2Handler) HandleToken(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// showSuccessPage displays a success page with debug information
+// showSuccessPage displays a success page after OAuth completion
 func (h *OAuth2Handler) showSuccessPage(w http.ResponseWriter, code, state string) {
-	w.Header().Set("Content-Type", "text/html")
+	// Log authorization details server-side (truncated for security)
+	log.Printf("OAuth2: Authorization successful - code: %s, state: %s",
+		truncateString(code, 10), truncateString(state, 10))
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(http.StatusOK)
-	_, _ = fmt.Fprintf(w, `
-		<html>
-		<head><title>OAuth2 Success</title></head>
+	_, _ = fmt.Fprintf(w, `<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<title>OAuth2 Success</title>
+		</head>
 		<body>
 			<h2>Authentication Successful!</h2>
 			<p>You have been successfully authenticated.</p>
-			<p>Authorization code: %s</p>
-			<p>State: %s</p>
 			<p>You can now close this window and return to your application.</p>
 		</body>
-		</html>
-	`, code, state)
+		</html>`)
 }
 
 // truncateString safely truncates a string for logging
