@@ -112,7 +112,7 @@ func (s *Server) ServeHTTP(port string) error {
 	mux := http.NewServeMux()
 
 	// Add status endpoint
-	mux.HandleFunc("/", s.handleStatus)
+	mux.HandleFunc("/status", s.handleStatus)
 
 	// Add OAuth metadata endpoints for MCP compliance
 	if s.config.OAuthEnabled && s.oauthHandler != nil {
