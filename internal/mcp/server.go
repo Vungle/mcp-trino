@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -256,10 +257,18 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				// Use consistent MCP URL from OAuth handler configuration
 				mcpURL := s.oauthHandler.GetConfig().MCPURL
 
-				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="%s", authorization_uri="%s/.well-known/oauth-authorization-server"`,
-					mcpURL,
+				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="OAuth", error="invalid_token", error_description="Missing or invalid access token", authorization_uri="%s/.well-known/oauth-authorization-server"`,
 					mcpURL))
+				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
+
+				errorResponse := map[string]string{
+					"error":             "invalid_token",
+					"error_description": "Missing or invalid access token",
+				}
+				if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+					log.Printf("Error encoding OAuth error response: %v", err)
+				}
 				return
 			}
 
