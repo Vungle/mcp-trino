@@ -206,7 +206,7 @@ func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Reque
 		"response_types_supported":   []string{"code"},
 		"response_modes_supported":   []string{"query"},
 		"grant_types_supported":      []string{"authorization_code"},
-		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
+		"token_endpoint_auth_methods_supported": []string{"none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
 		"subject_types_supported":    []string{"public"},
 		"scopes_supported":          []string{"openid", "profile", "email"},
@@ -246,7 +246,7 @@ func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} 
 		"response_types_supported":              []string{"code"},
 		"response_modes_supported":              []string{"query"},
 		"grant_types_supported":                 []string{"authorization_code"},
-		"token_endpoint_auth_methods_supported": []string{"client_secret_basic", "client_secret_post", "none"},
+		"token_endpoint_auth_methods_supported": []string{"none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
 	}
 
