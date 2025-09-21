@@ -306,6 +306,17 @@ func (h *OAuth2Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 
 // HandleToken handles OAuth2 token exchange
 func (h *OAuth2Handler) HandleToken(w http.ResponseWriter, r *http.Request) {
+	// Add CORS headers for browser-based MCP clients
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, *")
+	w.Header().Set("Access-Control-Max-Age", "86400")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

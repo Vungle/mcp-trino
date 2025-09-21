@@ -84,7 +84,8 @@ func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter,
 	// Add CORS headers for browser-based MCP clients like MCP Inspector
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, *")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 
 	switch r.Method {
 	case "OPTIONS", "HEAD":
@@ -139,6 +140,17 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 
 // HandleRegister handles OAuth dynamic client registration for mcp-remote
 func (h *OAuth2Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
+	// Add CORS headers for browser-based MCP clients
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, *")
+	w.Header().Set("Access-Control-Max-Age", "86400")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
