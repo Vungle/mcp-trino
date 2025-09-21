@@ -266,7 +266,9 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 					"error":             "invalid_token",
 					"error_description": "Missing or invalid access token",
 				}
-				json.NewEncoder(w).Encode(errorResponse)
+				if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+					log.Printf("Error encoding OAuth error response: %v", err)
+				}
 				return
 			}
 
