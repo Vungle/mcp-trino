@@ -81,8 +81,18 @@ func (h *OAuth2Handler) HandleMetadata(w http.ResponseWriter, r *http.Request) {
 func (h *OAuth2Handler) HandleAuthorizationServerMetadata(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=300") // Cache for 5 minutes
+	// Add CORS headers for browser-based MCP clients like MCP Inspector
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
 
-	if r.Method != "GET" {
+	switch r.Method {
+	case "OPTIONS", "HEAD":
+		w.WriteHeader(http.StatusOK)
+		return
+	case "GET":
+		// Continue to metadata response
+	default:
 		http.Error(w, `{"error":"Method not allowed"}`, http.StatusMethodNotAllowed)
 		return
 	}
