@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -250,16 +251,22 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 		if s.config.OAuthEnabled {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				// Return 401 with OAuth discovery information
+				// Return 401 with OAuth discovery information in Atlassian-compatible format
 				log.Printf("OAuth: No bearer token provided, returning 401 with discovery info")
 
 				// Use consistent MCP URL from OAuth handler configuration
 				mcpURL := s.oauthHandler.GetConfig().MCPURL
 
-				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="%s", authorization_uri="%s/.well-known/oauth-authorization-server"`,
-					mcpURL,
+				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="OAuth", error="invalid_token", error_description="Missing or invalid access token", authorization_uri="%s/.well-known/oauth-authorization-server"`,
 					mcpURL))
+				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
+
+				errorResponse := map[string]string{
+					"error":             "invalid_token",
+					"error_description": "Missing or invalid access token",
+				}
+				json.NewEncoder(w).Encode(errorResponse)
 				return
 			}
 
