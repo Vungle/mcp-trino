@@ -35,6 +35,11 @@ type TrinoConfig struct {
 	OIDCClientID     string // OIDC client ID
 	OIDCClientSecret string // OIDC client secret
 	OAuthRedirectURI string // Fixed OAuth redirect URI (overrides dynamic callback)
+
+	// Allowlist configuration for filtering catalogs, schemas, and tables
+	AllowedCatalogs []string // List of allowed catalogs (empty means no filtering)
+	AllowedSchemas  []string // List of allowed schemas in catalog.schema format
+	AllowedTables   []string // List of allowed tables in catalog.schema.table format
 }
 
 // NewTrinoConfig creates a new TrinoConfig with values from environment variables or defaults
@@ -92,6 +97,19 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 
 	queryTimeout := time.Duration(timeoutInt) * time.Second
 
+	// Parse allowlist configuration
+	allowedCatalogs := parseAllowlist(getEnv("TRINO_ALLOWED_CATALOGS", ""))
+	allowedSchemas := parseAllowlist(getEnv("TRINO_ALLOWED_SCHEMAS", ""))
+	allowedTables := parseAllowlist(getEnv("TRINO_ALLOWED_TABLES", ""))
+
+	// Validate allowlist formats
+	if err := validateAllowlist("TRINO_ALLOWED_SCHEMAS", allowedSchemas, 1); err != nil { // Must have catalog.schema format
+		return nil, err
+	}
+	if err := validateAllowlist("TRINO_ALLOWED_TABLES", allowedTables, 2); err != nil { // Must have catalog.schema.table format
+		return nil, err
+	}
+
 	// If using HTTPS, force SSL to true
 	if strings.EqualFold(scheme, "https") {
 		ssl = true
@@ -133,6 +151,9 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		log.Println("INFO: OAuth authentication is disabled (TRINO_OAUTH_ENABLED=false). Enable OAuth for production deployments.")
 	}
 
+	// Log allowlist configuration
+	logAllowlistConfiguration(allowedCatalogs, allowedSchemas, allowedTables)
+
 	return &TrinoConfig{
 		Host:              getEnv("TRINO_HOST", "localhost"),
 		Port:              port,
@@ -153,7 +174,58 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		OIDCClientID:      oidcClientID,
 		OIDCClientSecret:  oidcClientSecret,
 		OAuthRedirectURI:  oauthRedirectURI,
+		AllowedCatalogs:   allowedCatalogs,
+		AllowedSchemas:    allowedSchemas,
+		AllowedTables:     allowedTables,
 	}, nil
+}
+
+// parseAllowlist parses a comma-separated allowlist from an environment variable
+func parseAllowlist(value string) []string {
+	if value == "" {
+		return nil
+	}
+
+	// Split by comma and clean up entries
+	items := strings.Split(value, ",")
+	var result []string
+	for _, item := range items {
+		cleaned := strings.TrimSpace(item)
+		if cleaned != "" {
+			result = append(result, cleaned)
+		}
+	}
+	return result
+}
+
+// validateAllowlist validates the format of allowlist entries
+func validateAllowlist(envVar string, allowlist []string, expectedDots int) error {
+	for _, item := range allowlist {
+		dots := strings.Count(item, ".")
+		if dots != expectedDots {
+			return fmt.Errorf("invalid format in %s: '%s' (expected %d dots, found %d)",
+				envVar, item, expectedDots, dots)
+		}
+	}
+	return nil
+}
+
+// logAllowlistConfiguration logs the current allowlist configuration
+func logAllowlistConfiguration(catalogs, schemas, tables []string) {
+	if len(catalogs) > 0 || len(schemas) > 0 || len(tables) > 0 {
+		log.Println("INFO: Trino allowlist configuration:")
+		if len(catalogs) > 0 {
+			log.Printf("  - Allowed catalogs: %s (%d configured)", strings.Join(catalogs, ", "), len(catalogs))
+		}
+		if len(schemas) > 0 {
+			log.Printf("  - Allowed schemas: %s (%d configured)", strings.Join(schemas, ", "), len(schemas))
+		}
+		if len(tables) > 0 {
+			log.Printf("  - Allowed tables: %s (%d configured)", strings.Join(tables, ", "), len(tables))
+		}
+	} else {
+		log.Println("INFO: No Trino allowlists configured - all catalogs, schemas, and tables are accessible")
+	}
 }
 
 // getEnv retrieves an environment variable or returns a default value
