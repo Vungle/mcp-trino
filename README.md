@@ -100,6 +100,7 @@ graph TB
 ## Installation & Quick Start
 
 **Install:**
+
 ```bash
 # Homebrew
 brew install tuannvm/mcp/mcp-trino
@@ -109,6 +110,7 @@ curl -fsSL https://raw.githubusercontent.com/tuannvm/mcp-trino/main/install.sh |
 ```
 
 **Run (Local Development):**
+
 ```bash
 export TRINO_HOST=localhost TRINO_USER=trino
 mcp-trino
@@ -129,6 +131,7 @@ For client integration and tool documentation, see [Integration Guide](docs/inte
 **Key Variables:** `TRINO_HOST`, `TRINO_USER`, `TRINO_SCHEME`, `MCP_TRANSPORT`, `OAUTH_PROVIDER`
 
 **Performance Optimization (NEW):**
+
 ```bash
 # Focus AI on specific schemas only (10-20x performance improvement)
 export TRINO_ALLOWED_SCHEMAS="hive.analytics,hive.marts,hive.reporting"
