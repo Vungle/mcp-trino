@@ -60,7 +60,16 @@ trino:
   sslInsecure: false
   allowWriteQueries: false
   queryTimeout: 30
-  
+
+  # Allowlist configuration for performance optimization
+  allowlists:
+    # List of allowed catalogs (empty array means no filtering)
+    catalogs: []
+    # List of allowed schemas in catalog.schema format (empty array means no filtering)
+    schemas: []
+    # List of allowed tables in catalog.schema.table format (empty array means no filtering)
+    tables: []
+
   # OAuth 2.1 configuration
   oauth:
     enabled: false
