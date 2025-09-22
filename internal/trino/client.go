@@ -86,22 +86,6 @@ func isReadOnlyQuery(query string) bool {
 	// Remove string literals and comments to avoid false positives
 	queryLower = sanitizeQueryForKeywordDetection(queryLower)
 
-	// Ensure there's at least one space after keywords for proper prefix matching
-	if strings.HasPrefix(queryLower, "select") && !strings.HasPrefix(queryLower, "select ") {
-		queryLower = "select " + queryLower[6:]
-	}
-	if strings.HasPrefix(queryLower, "show") && !strings.HasPrefix(queryLower, "show ") {
-		queryLower = "show " + queryLower[4:]
-	}
-	if strings.HasPrefix(queryLower, "describe") && !strings.HasPrefix(queryLower, "describe ") {
-		queryLower = "describe " + queryLower[8:]
-	}
-	if strings.HasPrefix(queryLower, "explain") && !strings.HasPrefix(queryLower, "explain ") {
-		queryLower = "explain " + queryLower[7:]
-	}
-	if strings.HasPrefix(queryLower, "with") && !strings.HasPrefix(queryLower, "with ") {
-		queryLower = "with " + queryLower[4:]
-	}
 
 	// First check for SQL injection attempts with multiple statements
 	if strings.Contains(queryLower, ";") {
@@ -126,13 +110,18 @@ func isReadOnlyQuery(query string) bool {
 	}
 
 	// Check if query starts with SELECT, SHOW, DESCRIBE, EXPLAIN or WITH (for CTEs)
-	// These are generally read-only operations
-	readOnlyPrefixes := []string{
-		"select ", "show ", "describe ", "explain ", "with ",
+	// These are generally read-only operations. Use word boundaries for robustness.
+	readOnlyPrefixPatterns := []string{
+		`^\s*select\b`,
+		`^\s*show\b`,
+		`^\s*describe\b`,
+		`^\s*explain\b`,
+		`^\s*with\b`,
 	}
 
-	for _, prefix := range readOnlyPrefixes {
-		if strings.HasPrefix(queryLower, prefix) {
+	for _, pattern := range readOnlyPrefixPatterns {
+		matched, _ := regexp.MatchString(pattern, queryLower)
+		if matched {
 			return true
 		}
 	}
@@ -243,6 +232,11 @@ func (c *Client) ListCatalogs() ([]string, error) {
 		}
 	}
 
+	// Apply catalog filtering if allowlist is configured
+	if len(c.config.AllowedCatalogs) > 0 {
+		catalogs = c.filterCatalogs(catalogs)
+	}
+
 	return catalogs, nil
 }
 
@@ -263,6 +257,11 @@ func (c *Client) ListSchemas(catalog string) ([]string, error) {
 		if schema, ok := row["Schema"].(string); ok {
 			schemas = append(schemas, schema)
 		}
+	}
+
+	// Apply schema filtering if allowlist is configured
+	if len(c.config.AllowedSchemas) > 0 {
+		schemas = c.filterSchemas(schemas, catalog)
 	}
 
 	return schemas, nil
@@ -290,17 +289,23 @@ func (c *Client) ListTables(catalog, schema string) ([]string, error) {
 		}
 	}
 
+	// Apply table filtering if allowlist is configured
+	if len(c.config.AllowedTables) > 0 {
+		tables = c.filterTables(tables, catalog, schema)
+	}
+
 	return tables, nil
 }
 
 // GetTableSchema returns the schema of a table
 func (c *Client) GetTableSchema(catalog, schema, table string) ([]map[string]interface{}, error) {
-	// Check if table already contains a fully qualified name (catalog.schema.table)
+	// Resolve catalog/schema/table parameters first
 	parts := strings.Split(table, ".")
 	if len(parts) == 3 {
-		// If table is already fully qualified, use it directly
-		query := fmt.Sprintf("DESCRIBE %s", table)
-		return c.ExecuteQuery(query)
+		// If table is already fully qualified, extract components
+		catalog = parts[0]
+		schema = parts[1]
+		table = parts[2]
 	} else if len(parts) == 2 {
 		// If table has schema.table format
 		schema = parts[0]
@@ -318,6 +323,14 @@ func (c *Client) GetTableSchema(catalog, schema, table string) ([]map[string]int
 		}
 	}
 
+	// Check if table access is allowed when table allowlist is configured (after resolution)
+	if len(c.config.AllowedTables) > 0 {
+		if !c.isTableAllowed(catalog, schema, table) {
+			return nil, fmt.Errorf("table access denied: %s.%s.%s not in allowlist", catalog, schema, table)
+		}
+	}
+
+	// Build and execute query with resolved parameters
 	query := fmt.Sprintf("DESCRIBE %s.%s.%s", catalog, schema, table)
 	return c.ExecuteQuery(query)
 }
@@ -358,4 +371,87 @@ func sanitizeConnectionError(err error, password string) error {
 	}
 
 	return fmt.Errorf("%s", errStr)
+}
+
+// filterCatalogs filters a list of catalogs based on the allowlist configuration
+func (c *Client) filterCatalogs(catalogs []string) []string {
+	if len(c.config.AllowedCatalogs) == 0 {
+		return catalogs
+	}
+
+	filtered := make([]string, 0, len(catalogs))
+	for _, catalog := range catalogs {
+		if c.isCatalogAllowed(catalog) {
+			filtered = append(filtered, catalog)
+		}
+	}
+
+	log.Printf("DEBUG: Catalog filtering: %d catalogs -> %d catalogs", len(catalogs), len(filtered))
+	return filtered
+}
+
+// filterSchemas filters a list of schemas based on the allowlist configuration
+func (c *Client) filterSchemas(schemas []string, catalog string) []string {
+	if len(c.config.AllowedSchemas) == 0 {
+		return schemas
+	}
+
+	filtered := make([]string, 0, len(schemas))
+	for _, schema := range schemas {
+		if c.isSchemaAllowed(catalog, schema) {
+			filtered = append(filtered, schema)
+		}
+	}
+
+	log.Printf("DEBUG: Schema filtering: %d schemas -> %d schemas", len(schemas), len(filtered))
+	return filtered
+}
+
+// filterTables filters a list of tables based on the allowlist configuration
+func (c *Client) filterTables(tables []string, catalog, schema string) []string {
+	if len(c.config.AllowedTables) == 0 {
+		return tables
+	}
+
+	filtered := make([]string, 0, len(tables))
+	for _, table := range tables {
+		if c.isTableAllowed(catalog, schema, table) {
+			filtered = append(filtered, table)
+		}
+	}
+
+	log.Printf("DEBUG: Table filtering: %d tables -> %d tables", len(tables), len(filtered))
+	return filtered
+}
+
+// isCatalogAllowed checks if a catalog is in the allowed catalogs list
+func (c *Client) isCatalogAllowed(catalog string) bool {
+	for _, allowed := range c.config.AllowedCatalogs {
+		if strings.EqualFold(catalog, allowed) {
+			return true
+		}
+	}
+	return false
+}
+
+// isSchemaAllowed checks if a schema is in the allowed schemas list
+func (c *Client) isSchemaAllowed(catalog, schema string) bool {
+	fullSchemaName := catalog + "." + schema
+	for _, allowed := range c.config.AllowedSchemas {
+		if strings.EqualFold(fullSchemaName, allowed) {
+			return true
+		}
+	}
+	return false
+}
+
+// isTableAllowed checks if a table is in the allowed tables list
+func (c *Client) isTableAllowed(catalog, schema, table string) bool {
+	fullTableName := catalog + "." + schema + "." + table
+	for _, allowed := range c.config.AllowedTables {
+		if strings.EqualFold(fullTableName, allowed) {
+			return true
+		}
+	}
+	return false
 }
