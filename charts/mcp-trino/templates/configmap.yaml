@@ -18,6 +18,15 @@ data:
   MCP_TRANSPORT: {{ .Values.mcpServer.transport | quote }}
   MCP_HOST: {{ .Values.mcpServer.host | quote }}
   MCP_PORT: {{ .Values.mcpServer.port | quote }}
+  {{- if .Values.trino.allowlists.catalogs }}
+  TRINO_ALLOWED_CATALOGS: {{ .Values.trino.allowlists.catalogs | join "," | quote }}
+  {{- end }}
+  {{- if .Values.trino.allowlists.schemas }}
+  TRINO_ALLOWED_SCHEMAS: {{ .Values.trino.allowlists.schemas | join "," | quote }}
+  {{- end }}
+  {{- if .Values.trino.allowlists.tables }}
+  TRINO_ALLOWED_TABLES: {{ .Values.trino.allowlists.tables | join "," | quote }}
+  {{- end }}
   TRINO_OAUTH_ENABLED: {{ .Values.trino.oauth.enabled | quote }}
   {{- if .Values.trino.oauth.enabled }}
   OAUTH_PROVIDER: {{ .Values.trino.oauth.provider | quote }}

@@ -27,7 +27,13 @@ trino:
   schema: "analytics"
   allowWriteQueries: false  # Keep false for security
   queryTimeout: 60
-  
+
+  # Production allowlist configuration - restrict to essential schemas only
+  allowlists:
+    catalogs: []
+    schemas: []
+    tables: []
+
   oauth:
     enabled: true
     provider: "okta"
