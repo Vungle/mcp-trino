@@ -257,8 +257,11 @@ func (s *Server) createMCPHandler(streamableServer *mcpserver.StreamableHTTPServ
 				// Use consistent MCP URL from OAuth handler configuration
 				mcpURL := s.oauthHandler.GetConfig().MCPURL
 
-				w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer realm="OAuth", error="invalid_token", error_description="Missing or invalid access token", authorization_uri="%s/.well-known/oauth-authorization-server"`,
-					mcpURL))
+				// Multiple WWW-Authenticate headers for broad client compatibility (RFC 7235)
+				// Standard OAuth 2.0 Bearer challenge for traditional clients
+				w.Header().Add("WWW-Authenticate", `Bearer realm="OAuth", error="invalid_token", error_description="Missing or invalid access token"`)
+				// MCP-compliant resource metadata discovery for Claude.ai/Perplexity
+				w.Header().Add("WWW-Authenticate", fmt.Sprintf(`resource_metadata="%s/.well-known/oauth-protected-resource"`, mcpURL))
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 
