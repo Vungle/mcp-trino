@@ -88,6 +88,13 @@ func NewOAuth2Handler(cfg *OAuth2Config) *OAuth2Handler {
 		Scopes:       []string{"openid", "profile", "email"},
 	}
 
+	// Log client configuration type for debugging
+	if cfg.ClientSecret == "" {
+		log.Printf("OAuth2: Configuring public client (no client secret)")
+	} else {
+		log.Printf("OAuth2: Configuring confidential client (with client secret)")
+	}
+
 	return &OAuth2Handler{
 		config:       cfg,
 		oauth2Config: oauth2Config,
