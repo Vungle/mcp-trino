@@ -123,7 +123,7 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 	// Point directly to Okta to remove proxy behavior
 	metadata := map[string]interface{}{
 		"resource":                              h.config.MCPURL,
-		"authorization_servers":                 []string{h.config.MCPURL}, // Keep our server for discovery
+		"authorization_servers":                 []string{h.config.Issuer}, // Point directly to Okta - no proxy
 		"bearer_methods_supported":              []string{"header"},
 		"resource_signing_alg_values_supported": []string{"RS256"},
 		"resource_documentation":                fmt.Sprintf("%s/docs", h.config.MCPURL),
