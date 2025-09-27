@@ -272,6 +272,7 @@ func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} 
 		"grant_types_supported":                 []string{"authorization_code"},
 		"token_endpoint_auth_methods_supported": []string{"none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
+		"scopes_supported":                      []string{"openid", "profile", "email"},
 	}
 
 	return metadata
