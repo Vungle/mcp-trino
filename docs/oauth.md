@@ -126,6 +126,88 @@ The MCP server supports two distinct OAuth operational modes to accommodate diff
 - **HTTP Transport**: StreamableHTTP endpoint (`/mcp`) with backward compatibility (`/sse`)
 - **Multiple Providers**: Configurable provider selection via environment variables
 
+## OAuth Configuration Guide
+
+This section provides clear guidance on what configuration is needed for each OAuth mode and provider combination.
+
+### 🔐 HMAC Provider (Self-Signed Tokens)
+
+| Mode | JWT Secret on Server | Result | What This Means |
+|------|---------------------|--------|-----------------|
+| Native | ✅ Configured | ✅ **Ready to go** | Server can validate tokens from clients |
+| Native | ❌ Missing | ❌ **Won't start** | Error: "JWT_SECRET is required when using HMAC provider" |
+| Proxy | ✅ Configured | ✅ **Ready to go** | Server can issue tokens to clients |
+| Proxy | ❌ Missing | ❌ **Won't start** | Error: "JWT_SECRET is required when using HMAC provider" |
+
+### 🌐 External Providers (Okta, Google, Azure)
+
+#### Native Mode - Client handles OAuth directly
+| Server Has | OAuth App Auth Method | Client Must Have | Result | What Happens |
+|------------|----------------------|------------------|--------|--------------|
+| Issuer + Audience | **None** (Public) | Client ID + Endpoints | ✅ **Perfect** | PKCE flow, most secure for public clients |
+| Issuer + Audience | **Client Secret** | Client ID + Secret + Endpoints | ✅ **Perfect** | Traditional confidential client flow |
+| Issuer + Audience | Any method | **Only Client Secret** | ❌ **Invalid** | Client ID is always required |
+| Issuer + Audience | Any method | **Neither ID nor Secret** | ❌ **Won't authenticate** | Client can't start OAuth flow |
+| Missing Audience | Any method | Any client config | ❌ **Won't start** | Error: "OIDC_AUDIENCE is required for [provider]" |
+
+#### Proxy Mode - Server handles OAuth for client
+| OAuth App Auth Method | Server Configuration | Result | What This Means |
+|-----------------------|---------------------|--------|-----------------|
+| **None** (Public) | Client ID + Issuer + Redirect URIs | ✅ **Perfect** | Public client proxy with PKCE |
+| **Client Secret** | Client ID + Secret + Issuer + Redirect URIs | ✅ **Perfect** | Confidential client proxy |
+| **Client Secret** | Client ID + Missing Secret | ⚠️ **Will fail** | Mismatch: app expects secret but server missing it |
+| **None** (Public) | Client ID + Secret provided | ⚠️ **Might work** | Secret ignored for public apps |
+| Any method | Missing Client ID | ⚠️ **Broken** | Client identification impossible |
+
+**⚠️ Currently Not Supported:**
+- **Public Key/Private Key (JWT Client Assertion)** - Would require additional implementation
+
+### 📋 Quick Decision Guide
+
+**Choose Native Mode when:**
+- Your client (Claude.ai, etc.) can handle OAuth
+- You want maximum security (no secrets on server)
+- Each user has their own OAuth app
+
+**Choose Proxy Mode when:**
+- Your client can't handle OAuth
+- You want centralized credential management
+- One OAuth app for all users
+
+**HMAC Provider when:**
+- You want simplest setup
+- You trust your own token signing
+- No external OAuth provider available
+
+### 📝 OAuth App Authentication Methods
+
+**None (Public Client):**
+- **Okta Setting**: Client authentication = "None"
+- **Security**: Uses PKCE (Proof Key for Code Exchange) for security
+- **Use Case**: Mobile apps, SPAs, desktop applications that can't securely store secrets
+- **Required**: Client ID only
+- **Examples**: Claude Desktop app, browser-based clients
+
+**Client Secret (Confidential Client):**
+- **Okta Setting**: Client authentication = "Client Secret"
+- **Security**: Client authenticates with secret during token exchange
+- **Use Case**: Server-side applications that can securely store secrets
+- **Required**: Client ID + Client Secret
+- **Examples**: Web applications, server-to-server integrations
+
+### ⚠️ **Important Configuration Matching**
+Your MCP server configuration **must match** the OAuth app's authentication method:
+- If Okta app uses "None" → Don't configure `OIDC_CLIENT_SECRET`
+- If Okta app uses "Client Secret" → Must configure `OIDC_CLIENT_SECRET`
+
+**Mismatch = Authentication Failure!**
+
+### ❌ **Currently Not Supported**
+**Public Key/Private Key (JWT Client Assertion):**
+- **Okta Setting**: Client authentication = "Public Key/Private Key"
+- **Status**: Not implemented in current version
+- **Alternative**: Use "None" (public) or "Client Secret" authentication methods
+
 ## Implementation Plan for Dual OAuth Modes
 
 Based on security review and architectural analysis, this plan prioritizes safety-first implementation with thorough validation.
