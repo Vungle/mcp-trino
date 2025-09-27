@@ -115,6 +115,9 @@ func (s *Server) ServeHTTP(port string) error {
 	// Add status endpoint
 	mux.HandleFunc("/status", s.handleStatus)
 
+	// Add HTTPS enforcement middleware for proxy mode (Phase 3 implementation)
+	httpsEnforcement := s.createHTTPSEnforcementMiddleware()
+
 	// Add OAuth metadata endpoints for MCP compliance
 	if s.config.OAuthEnabled && s.oauthHandler != nil {
 		// OIDC Discovery endpoint (RFC 8414) - required for MCP clients (Claude Code, Desktop, claude.ai)
@@ -127,14 +130,23 @@ func (s *Server) ServeHTTP(port string) error {
 		// Legacy endpoint for backward compatibility
 		mux.HandleFunc("/.well-known/oauth-metadata", s.oauthHandler.HandleMetadata)
 
-		// Add OAuth authorization flow endpoints
-		mux.HandleFunc("/oauth/authorize", s.oauthHandler.HandleAuthorize)
-		mux.HandleFunc("/oauth/callback", s.oauthHandler.HandleCallback)
-		mux.HandleFunc("/oauth/register", s.oauthHandler.HandleRegister)
-		mux.HandleFunc("/oauth/token", s.oauthHandler.HandleToken)
+		// Conditional route registration based on OAuth mode (Phase 1 implementation)
+		if s.config.OAuthMode == "proxy" {
+			// Proxy mode: Register OAuth flow endpoints with HTTPS enforcement
+			mux.HandleFunc("/oauth/authorize", httpsEnforcement(s.oauthHandler.HandleAuthorize))
+			mux.HandleFunc("/oauth/callback", httpsEnforcement(s.oauthHandler.HandleCallback))
+			mux.HandleFunc("/oauth/register", httpsEnforcement(s.oauthHandler.HandleRegister))
+			mux.HandleFunc("/oauth/token", httpsEnforcement(s.oauthHandler.HandleToken))
+			mux.HandleFunc("/callback", httpsEnforcement(s.oauthHandler.HandleCallbackRedirect))
 
-		// Add /callback redirect for Claude Code compatibility
-		mux.HandleFunc("/callback", s.oauthHandler.HandleCallbackRedirect)
+			// JWKS endpoint for proxy mode only
+			mux.HandleFunc("/.well-known/jwks.json", s.oauthHandler.HandleJWKS)
+
+			log.Printf("INFO: OAuth proxy mode - registered OAuth flow endpoints with HTTPS enforcement")
+		} else {
+			// Native mode: OAuth endpoints are not registered
+			log.Printf("INFO: OAuth native mode - OAuth flow endpoints disabled")
+		}
 
 		// Add OAuth discovery endpoints at /mcp path for mcp-remote 0.1.19+ compatibility
 		// mcp-remote incorrectly appends /.well-known/* to the full MCP endpoint URL
@@ -383,6 +395,23 @@ func GetOAuthMiddleware(mcpServer *mcpserver.MCPServer) func(mcpserver.ToolHandl
 	serverMiddlewareMu.RLock()
 	defer serverMiddlewareMu.RUnlock()
 	return serverMiddleware[mcpServer]
+}
+
+// createHTTPSEnforcementMiddleware creates HTTPS enforcement middleware for proxy mode
+func (s *Server) createHTTPSEnforcementMiddleware() func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			// Check if request is secure (direct TLS or via trusted proxy)
+			isSecure := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
+
+			if !isSecure && s.config.OAuthMode == "proxy" {
+				log.Printf("SECURITY: Rejected non-HTTPS OAuth request from %s to %s", r.RemoteAddr, r.URL.Path)
+				http.Error(w, "HTTPS required for OAuth endpoints", http.StatusForbidden)
+				return
+			}
+			next(w, r)
+		}
+	}
 }
 
 // getEnv gets environment variable with default value
