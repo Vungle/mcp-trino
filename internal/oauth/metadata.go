@@ -120,9 +120,10 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 	}
 
 	// Return OAuth 2.0 Protected Resource Metadata (RFC 9728)
+	// Point directly to Okta to remove proxy behavior
 	metadata := map[string]interface{}{
 		"resource":                              h.config.MCPURL,
-		"authorization_servers":                 []string{h.config.MCPURL},
+		"authorization_servers":                 []string{h.config.MCPURL}, // Keep our server for discovery
 		"bearer_methods_supported":              []string{"header"},
 		"resource_signing_alg_values_supported": []string{"RS256"},
 		"resource_documentation":                fmt.Sprintf("%s/docs", h.config.MCPURL),
@@ -258,13 +259,14 @@ func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata
+// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata pointing to Okta
 func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} {
+	// Return Okta's endpoints to eliminate proxy behavior while keeping discovery working
 	metadata := map[string]interface{}{
-		"issuer":                                h.config.MCPURL,
-		"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
-		"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+		"issuer":                                h.config.Issuer, // Okta issuer
+		"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer),
+		"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer),
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL), // Keep our registration
 		"response_types_supported":              []string{"code"},
 		"response_modes_supported":              []string{"query"},
 		"grant_types_supported":                 []string{"authorization_code"},
