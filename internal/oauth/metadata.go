@@ -266,17 +266,12 @@ func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} 
 		"issuer":                                h.config.Issuer, // Okta issuer
 		"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer),
 		"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL), // Keep our registration
+		"registration_endpoint":                 fmt.Sprintf("%s/oauth2/v1/clients", h.config.Issuer), // Okta registration
 		"response_types_supported":              []string{"code"},
 		"response_modes_supported":              []string{"query"},
 		"grant_types_supported":                 []string{"authorization_code"},
 		"token_endpoint_auth_methods_supported": []string{"none"},
 		"code_challenge_methods_supported":      []string{"plain", "S256"},
-	}
-
-	// Add redirect URIs for mcp-remote compatibility
-	if h.config.RedirectURI != "" {
-		metadata["redirect_uris"] = []string{h.config.RedirectURI}
 	}
 
 	return metadata
