@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -184,10 +185,11 @@ func (h *OAuth2Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	if redirectUris, ok := regRequest["redirect_uris"]; ok {
 		response["redirect_uris"] = redirectUris
 		log.Printf("OAuth2: Registration allowing client redirect URIs: %v", redirectUris)
-	} else if h.config.RedirectURI != "" {
-		// Fallback to fixed redirect URI if no client URIs provided
-		response["redirect_uris"] = []string{h.config.RedirectURI}
-		log.Printf("OAuth2: Registration response using fixed redirect URI: %s", h.config.RedirectURI)
+	} else if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
+		// Fallback to fixed redirect URI if no client URIs provided (single URI only)
+		trimmedURI := strings.TrimSpace(h.config.RedirectURIs)
+		response["redirect_uris"] = []string{trimmedURI}
+		log.Printf("OAuth2: Registration response using fixed redirect URI: %s", trimmedURI)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -259,20 +261,54 @@ func (h *OAuth2Handler) HandleOIDCDiscovery(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata pointing to Okta
+// GetAuthorizationServerMetadata returns the OAuth 2.0 Authorization Server Metadata
+// with conditional responses based on OAuth mode
 func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} {
-	// Return Okta's endpoints to eliminate proxy behavior while keeping discovery working
-	metadata := map[string]interface{}{
-		"issuer":                                h.config.Issuer, // Okta issuer
-		"authorization_endpoint":                fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer),
-		"token_endpoint":                        fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer),
-		"registration_endpoint":                 fmt.Sprintf("%s/oauth2/v1/clients", h.config.Issuer), // Okta registration
-		"response_types_supported":              []string{"code"},
-		"response_modes_supported":              []string{"query"},
-		"grant_types_supported":                 []string{"authorization_code"},
-		"token_endpoint_auth_methods_supported": []string{"none"},
-		"code_challenge_methods_supported":      []string{"plain", "S256"},
-		"scopes_supported":                      []string{"openid", "profile", "email"},
+	var metadata map[string]interface{}
+
+	if h.config.Mode == "native" {
+		// Native mode: Point to OAuth provider directly
+		metadata = map[string]interface{}{
+			"issuer":                                h.config.Issuer, // OAuth provider issuer
+			"response_types_supported":              []string{"code"},
+			"response_modes_supported":              []string{"query"},
+			"grant_types_supported":                 []string{"authorization_code"},
+			"token_endpoint_auth_methods_supported": []string{"none"},
+			"code_challenge_methods_supported":      []string{"plain", "S256"},
+			"scopes_supported":                      []string{"openid", "profile", "email"},
+		}
+
+		// Add provider-specific endpoints
+		switch h.config.Provider {
+		case "okta":
+			metadata["authorization_endpoint"] = fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer)
+			metadata["token_endpoint"] = fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer)
+			metadata["registration_endpoint"] = fmt.Sprintf("%s/oauth2/v1/clients", h.config.Issuer)
+			metadata["jwks_uri"] = fmt.Sprintf("%s/.well-known/jwks.json", h.config.Issuer)
+		case "google":
+			metadata["authorization_endpoint"] = "https://accounts.google.com/o/oauth2/v2/auth"
+			metadata["token_endpoint"] = "https://oauth2.googleapis.com/token"
+			metadata["jwks_uri"] = "https://www.googleapis.com/oauth2/v3/certs"
+		case "azure":
+			metadata["authorization_endpoint"] = fmt.Sprintf("%s/oauth2/v2.0/authorize", h.config.Issuer)
+			metadata["token_endpoint"] = fmt.Sprintf("%s/oauth2/v2.0/token", h.config.Issuer)
+			metadata["jwks_uri"] = fmt.Sprintf("%s/discovery/v2.0/keys", h.config.Issuer)
+		}
+	} else {
+		// Proxy mode: Point to MCP server endpoints
+		metadata = map[string]interface{}{
+			"issuer":                                h.config.MCPURL,
+			"authorization_endpoint":                fmt.Sprintf("%s/oauth/authorize", h.config.MCPURL),
+			"token_endpoint":                        fmt.Sprintf("%s/oauth/token", h.config.MCPURL),
+			"registration_endpoint":                 fmt.Sprintf("%s/oauth/register", h.config.MCPURL),
+			"jwks_uri":                             fmt.Sprintf("%s/.well-known/jwks.json", h.config.MCPURL),
+			"response_types_supported":              []string{"code"},
+			"response_modes_supported":              []string{"query"},
+			"grant_types_supported":                 []string{"authorization_code"},
+			"token_endpoint_auth_methods_supported": []string{"none"},
+			"code_challenge_methods_supported":      []string{"plain", "S256"},
+			"scopes_supported":                      []string{"openid", "profile", "email"},
+		}
 	}
 
 	return metadata

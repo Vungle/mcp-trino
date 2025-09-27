@@ -34,8 +34,9 @@ func (h *OAuth2Handler) GetConfig() *OAuth2Config {
 // OAuth2Config holds OAuth2 configuration
 type OAuth2Config struct {
 	Enabled     bool
+	Mode        string // "native" or "proxy"
 	Provider    string
-	RedirectURI string
+	RedirectURIs string
 
 	// OIDC configuration
 	Issuer       string
@@ -64,7 +65,7 @@ func NewOAuth2Handler(cfg *OAuth2Config) *OAuth2Handler {
 	case "okta", "google", "azure":
 		// Use OIDC discovery to get correct endpoints
 		if discoveredEndpoint, err := discoverOIDCEndpoints(cfg.Issuer); err != nil {
-			log.Printf("Warning: OIDC discovery failed for %s, using fallback endpoints: %v", cfg.Provider, err)
+			log.Printf("ERROR: OIDC discovery failed for %s provider. Using Okta-style fallback endpoints which may not work for all providers: %v", cfg.Provider, err)
 			// Fallback to Okta-style endpoints as they're most common
 			endpoint = oauth2.Endpoint{
 				AuthURL:  cfg.Issuer + "/oauth2/v1/authorize",
@@ -141,23 +142,97 @@ func NewOAuth2ConfigFromTrinoConfig(trinoConfig *config.TrinoConfig, version str
 	mcpURL := getEnv("MCP_URL", fmt.Sprintf("%s://%s:%s", scheme, mcpHost, mcpPort))
 
 	return &OAuth2Config{
-		Enabled:      trinoConfig.OAuthEnabled,
-		Provider:     trinoConfig.OAuthProvider,
-		RedirectURI:  trinoConfig.OAuthRedirectURI,
-		Issuer:       trinoConfig.OIDCIssuer,
-		Audience:     trinoConfig.OIDCAudience,
-		ClientID:     trinoConfig.OIDCClientID,
-		ClientSecret: trinoConfig.OIDCClientSecret,
-		MCPHost:      mcpHost,
-		MCPPort:      mcpPort,
-		MCPURL:       mcpURL,
-		Scheme:       scheme,
-		Version:      version,
+		Enabled:          trinoConfig.OAuthEnabled,
+		Mode:             trinoConfig.OAuthMode,
+		Provider:         trinoConfig.OAuthProvider,
+		RedirectURIs:     trinoConfig.OAuthRedirectURIs,
+		Issuer:           trinoConfig.OIDCIssuer,
+		Audience:         trinoConfig.OIDCAudience,
+		ClientID:         trinoConfig.OIDCClientID,
+		ClientSecret:     trinoConfig.OIDCClientSecret,
+		MCPHost:          mcpHost,
+		MCPPort:          mcpPort,
+		MCPURL:           mcpURL,
+		Scheme:           scheme,
+		Version:          version,
+	}
+}
+
+// HandleJWKS handles the JWKS endpoint for proxy mode
+func (h *OAuth2Handler) HandleJWKS(w http.ResponseWriter, r *http.Request) {
+	// Defense in depth: Check OAuth mode
+	if h.config.Mode == "native" {
+		http.Error(w, "JWKS endpoint disabled in native mode", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=300") // Cache for 5 minutes
+
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Proxy JWKS from upstream OAuth provider
+	var jwksURL string
+	switch h.config.Provider {
+	case "okta":
+		jwksURL = fmt.Sprintf("%s/.well-known/jwks.json", h.config.Issuer)
+	case "google":
+		jwksURL = "https://www.googleapis.com/oauth2/v3/certs"
+	case "azure":
+		jwksURL = fmt.Sprintf("%s/discovery/v2.0/keys", h.config.Issuer)
+	case "hmac":
+		// HMAC doesn't use JWKS, return empty key set
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"keys":[]}`))
+		return
+	default:
+		http.Error(w, "JWKS not supported for this provider", http.StatusNotImplemented)
+		return
+	}
+
+	// Create HTTP client with timeout
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
+		},
+	}
+
+	// Fetch JWKS from upstream provider
+	resp, err := client.Get(jwksURL)
+	if err != nil {
+		log.Printf("OAuth2: Failed to fetch JWKS from %s: %v", jwksURL, err)
+		http.Error(w, "Failed to fetch JWKS", http.StatusBadGateway)
+		return
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("OAuth2: JWKS endpoint returned status %d", resp.StatusCode)
+		http.Error(w, "JWKS endpoint error", http.StatusBadGateway)
+		return
+	}
+
+	// Copy response headers
+	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+	w.WriteHeader(http.StatusOK)
+
+	// Copy response body
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		log.Printf("OAuth2: Failed to proxy JWKS response: %v", err)
 	}
 }
 
 // HandleAuthorize handles OAuth2 authorization requests with PKCE
 func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) {
+	// Defense in depth: Check OAuth mode
+	if h.config.Mode == "native" {
+		http.Error(w, "OAuth proxy disabled in native mode", http.StatusNotFound)
+		return
+	}
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -176,10 +251,17 @@ func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) 
 	log.Printf("OAuth2: Authorization request - client_id: %s, redirect_uri: %s, code_challenge: %s",
 		clientID, clientRedirectURI, truncateString(codeChallenge, 10))
 
+	// Validate redirect URI against allowlist for security (Phase 3 implementation)
+	if !h.isValidRedirectURI(clientRedirectURI) {
+		log.Printf("SECURITY: Invalid redirect URI rejected: %s from %s", clientRedirectURI, r.RemoteAddr)
+		http.Error(w, "Invalid redirect_uri", http.StatusBadRequest)
+		return
+	}
+
 	// Set redirect URI - use fixed URI if configured, otherwise use client's URI
 	redirectURI := clientRedirectURI
-	if h.config.RedirectURI != "" {
-		redirectURI = h.config.RedirectURI
+	if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
+		redirectURI = strings.TrimSpace(h.config.RedirectURIs)
 		log.Printf("OAuth2: Using fixed redirect URI: %s (overriding client's %s)", redirectURI, clientRedirectURI)
 	}
 
@@ -203,7 +285,7 @@ func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) 
 		query.Set("code_challenge_method", codeChallengeMethod)
 
 		// If using fixed redirect URI, encode original client URI in state
-		if h.config.RedirectURI != "" {
+		if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
 			// Encode state and redirect URI safely using JSON + base64
 			stateData := map[string]string{
 				"state":    state,
@@ -230,6 +312,12 @@ func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) 
 
 // HandleCallback handles OAuth2 callback
 func (h *OAuth2Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
+	// Defense in depth: Check OAuth mode
+	if h.config.Mode == "native" {
+		http.Error(w, "OAuth proxy disabled in native mode", http.StatusNotFound)
+		return
+	}
+
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -258,7 +346,7 @@ func (h *OAuth2Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If using fixed redirect URI, handle proxy callback
-	if h.config.RedirectURI != "" {
+	if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
 		// Try to decode the state parameter
 		jsonData, err := base64.URLEncoding.DecodeString(state)
 		if err == nil {
@@ -306,6 +394,12 @@ func (h *OAuth2Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 
 // HandleToken handles OAuth2 token exchange
 func (h *OAuth2Handler) HandleToken(w http.ResponseWriter, r *http.Request) {
+	// Defense in depth: Check OAuth mode
+	if h.config.Mode == "native" {
+		http.Error(w, "OAuth proxy disabled in native mode", http.StatusNotFound)
+		return
+	}
+
 	// Add CORS headers for browser-based MCP clients
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
@@ -356,8 +450,8 @@ func (h *OAuth2Handler) HandleToken(w http.ResponseWriter, r *http.Request) {
 
 	// Set redirect URI for token exchange
 	redirectURI := clientRedirectURI
-	if h.config.RedirectURI != "" {
-		redirectURI = h.config.RedirectURI
+	if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
+		redirectURI = strings.TrimSpace(h.config.RedirectURIs)
 		log.Printf("OAuth2: Token exchange using fixed redirect URI: %s", redirectURI)
 	}
 
@@ -502,4 +596,47 @@ func getEnv(key, def string) string {
 		return v
 	}
 	return def
+}
+
+// isValidRedirectURI validates redirect URI against allowlist for security
+func (h *OAuth2Handler) isValidRedirectURI(uri string) bool {
+	if h.config.RedirectURIs == "" {
+		// No redirect URIs configured - reject all redirects for security
+		log.Printf("WARNING: No OAuth redirect URIs configured, rejecting redirect: %s", uri)
+		return false
+	}
+
+	// Parse allowlist
+	allowedURIs := strings.Split(h.config.RedirectURIs, ",")
+	for _, allowed := range allowedURIs {
+		allowed = strings.TrimSpace(allowed)
+		if allowed != "" && uri == allowed {
+			return true
+		}
+	}
+
+	return false
+}
+
+// validateOAuthParams performs basic input validation to prevent abuse
+func (h *OAuth2Handler) validateOAuthParams(r *http.Request) error {
+	// Basic length validation to prevent abuse
+	if code := r.FormValue("code"); len(code) > 512 {
+		return fmt.Errorf("invalid code parameter length")
+	}
+	if state := r.FormValue("state"); len(state) > 256 {
+		return fmt.Errorf("invalid state parameter length")
+	}
+	if challenge := r.FormValue("code_challenge"); len(challenge) > 256 {
+		return fmt.Errorf("invalid code_challenge parameter length")
+	}
+	return nil
+}
+
+// addSecurityHeaders adds essential security headers for OAuth endpoints
+func (h *OAuth2Handler) addSecurityHeaders(w http.ResponseWriter) {
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("X-Frame-Options", "DENY")
+	w.Header().Set("Cache-Control", "no-store, no-cache, max-age=0")
+	w.Header().Set("Pragma", "no-cache")
 }
