@@ -73,10 +73,11 @@ trino:
   # OAuth 2.1 configuration
   oauth:
     enabled: false
+    mode: "native"  # native or proxy
     provider: "hmac"  # hmac, okta, google, azure
     jwtSecret: ""
-    redirectURI: ""
-    
+    redirectURIs: ""  # Single redirect URI or comma-separated list for proxy mode
+
     # OIDC configuration
     oidc:
       issuer: ""
