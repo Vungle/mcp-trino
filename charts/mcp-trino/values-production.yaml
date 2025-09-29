@@ -36,7 +36,10 @@ trino:
 
   oauth:
     enabled: true
+    mode: "proxy"  # "native" for direct OAuth, "proxy" for centralized credentials
     provider: "okta"
+    jwtSecret: ""  # Required for multi-pod deployments - use: openssl rand -hex 32
+    redirectURIs: "https://mcp-server.company.com/oauth/callback"  # Single URI (fixed mode) or comma-separated (allowlist mode)
     oidc:
       issuer: "https://company.okta.com"
       audience: "trino-mcp"

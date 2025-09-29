@@ -93,6 +93,11 @@ graph TB
 - ✅ Docker container support
 - ✅ Supports both STDIO and HTTP transports
 - ✅ OAuth 2.0 authentication with OIDC provider support (Okta, Google, Azure AD)
+  - **Native mode**: Direct OAuth with zero server-side secrets
+  - **Proxy mode**: Centralized OAuth with fixed/allowlist redirect URIs
+  - HMAC-SHA256 state signing for multi-pod deployments
+  - PKCE support for enhanced security
+  - Defense-in-depth security model with four independent validation layers
 - ✅ StreamableHTTP support with JWT authentication (upgraded from SSE)
 - ✅ Backward compatibility with SSE endpoints
 - ✅ Compatible with Cursor, Claude Desktop, Windsurf, ChatWise, and any MCP-compatible clients.
@@ -116,7 +121,7 @@ export TRINO_HOST=localhost TRINO_USER=trino
 mcp-trino
 ```
 
-For production deployment with OAuth, see [Deployment Guide](docs/deployment.md).
+For production deployment with OAuth, see [Deployment Guide](docs/deployment.md) and [OAuth Architecture](docs/oauth.md).
 
 ## Usage
 
@@ -130,14 +135,28 @@ For client integration and tool documentation, see [Integration Guide](docs/inte
 
 **Key Variables:** `TRINO_HOST`, `TRINO_USER`, `TRINO_SCHEME`, `MCP_TRANSPORT`, `OAUTH_PROVIDER`
 
-**Performance Optimization (NEW):**
+**OAuth Configuration:**
+
+```bash
+# Native mode (most secure - zero server-side secrets)
+export OAUTH_ENABLED=true OAUTH_MODE=native OAUTH_PROVIDER=okta
+export OIDC_ISSUER=https://company.okta.com OIDC_AUDIENCE=https://mcp-server.com
+
+# Proxy mode (centralized credential management)
+export OAUTH_MODE=proxy OIDC_CLIENT_ID=app-id OIDC_CLIENT_SECRET=secret
+export OAUTH_REDIRECT_URI=https://mcp-server.com/oauth/callback  # Fixed mode (localhost-only)
+export OAUTH_REDIRECT_URI=https://app1.com/cb,https://app2.com/cb  # Allowlist mode
+export JWT_SECRET=$(openssl rand -hex 32)  # Required for multi-pod deployments
+```
+
+**Performance Optimization:**
 
 ```bash
 # Focus AI on specific schemas only (10-20x performance improvement)
 export TRINO_ALLOWED_SCHEMAS="hive.analytics,hive.marts,hive.reporting"
 ```
 
-For complete configuration and allowlist setup, see [Deployment Guide](docs/deployment.md) and [Allowlists Guide](docs/allowlists.md).
+For complete configuration, see [Deployment Guide](docs/deployment.md), [OAuth Architecture](docs/oauth.md), and [Allowlists Guide](docs/allowlists.md).
 
 ## Contributing
 
