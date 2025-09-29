@@ -121,10 +121,19 @@ func (h *OAuth2Handler) HandleProtectedResourceMetadata(w http.ResponseWriter, r
 	}
 
 	// Return OAuth 2.0 Protected Resource Metadata (RFC 9728)
-	// Point directly to Okta to remove proxy behavior
+	// Point to authorization server based on mode
+	var authServer string
+	if h.config.Mode == "proxy" {
+		// Proxy mode: MCP server acts as authorization server
+		authServer = h.config.MCPURL
+	} else {
+		// Native mode: Point directly to OAuth provider
+		authServer = h.config.Issuer
+	}
+
 	metadata := map[string]interface{}{
 		"resource":                              h.config.MCPURL,
-		"authorization_servers":                 []string{h.config.Issuer}, // Point directly to Okta - no proxy
+		"authorization_servers":                 []string{authServer},
 		"bearer_methods_supported":              []string{"header"},
 		"resource_signing_alg_values_supported": []string{"RS256"},
 		"resource_documentation":                fmt.Sprintf("%s/docs", h.config.MCPURL),
@@ -284,7 +293,7 @@ func (h *OAuth2Handler) GetAuthorizationServerMetadata() map[string]interface{} 
 			metadata["authorization_endpoint"] = fmt.Sprintf("%s/oauth2/v1/authorize", h.config.Issuer)
 			metadata["token_endpoint"] = fmt.Sprintf("%s/oauth2/v1/token", h.config.Issuer)
 			metadata["registration_endpoint"] = fmt.Sprintf("%s/oauth2/v1/clients", h.config.Issuer)
-			metadata["jwks_uri"] = fmt.Sprintf("%s/.well-known/jwks.json", h.config.Issuer)
+			metadata["jwks_uri"] = fmt.Sprintf("%s/oauth2/v1/keys", h.config.Issuer)
 		case "google":
 			metadata["authorization_endpoint"] = "https://accounts.google.com/o/oauth2/v2/auth"
 			metadata["token_endpoint"] = "https://oauth2.googleapis.com/token"
