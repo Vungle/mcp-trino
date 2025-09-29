@@ -207,7 +207,8 @@ func (h *OAuth2Handler) HandleJWKS(w http.ResponseWriter, r *http.Request) {
 	var jwksURL string
 	switch h.config.Provider {
 	case "okta":
-		jwksURL = fmt.Sprintf("%s/.well-known/jwks.json", h.config.Issuer)
+		// Use Okta's standard JWKS path
+		jwksURL = fmt.Sprintf("%s/oauth2/v1/keys", h.config.Issuer)
 	case "google":
 		jwksURL = "https://www.googleapis.com/oauth2/v3/certs"
 	case "azure":
