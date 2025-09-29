@@ -2,8 +2,12 @@ package oauth
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha256"
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -54,6 +58,9 @@ type OAuth2Config struct {
 
 	// Server version
 	Version string
+
+	// State signing key for integrity protection
+	stateSigningKey []byte
 }
 
 // NewOAuth2Handler creates a new OAuth2 handler using the standard library
@@ -94,6 +101,20 @@ func NewOAuth2Handler(cfg *OAuth2Config) *OAuth2Handler {
 		log.Printf("OAuth2: Configuring public client (no client secret)")
 	} else {
 		log.Printf("OAuth2: Configuring confidential client (with client secret)")
+	}
+
+	// Initialize state signing key
+	if len(cfg.stateSigningKey) == 0 {
+		log.Printf("WARNING: No state signing key configured, generating random key (will not persist across restarts)")
+		key := make([]byte, 32)
+		if _, err := rand.Read(key); err != nil {
+			log.Printf("ERROR: Failed to generate state signing key: %v", err)
+			// Use a deterministic fallback (not ideal, but better than nothing)
+			cfg.stateSigningKey = []byte("insecure-fallback-key-please-configure-JWT_SECRET")
+			log.Printf("WARNING: Using insecure fallback key. Please configure JWT_SECRET environment variable.")
+		} else {
+			cfg.stateSigningKey = key
+		}
 	}
 
 	return &OAuth2Handler{
@@ -162,6 +183,7 @@ func NewOAuth2ConfigFromTrinoConfig(trinoConfig *config.TrinoConfig, version str
 		MCPURL:           mcpURL,
 		Scheme:           scheme,
 		Version:          version,
+		stateSigningKey:  []byte(trinoConfig.JWTSecret),
 	}
 }
 
@@ -258,27 +280,103 @@ func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) 
 	log.Printf("OAuth2: Authorization request - client_id: %s, redirect_uri: %s, code_challenge: %s",
 		clientID, clientRedirectURI, truncateString(codeChallenge, 10))
 
-	// Validate redirect URI against allowlist for security (Phase 3 implementation)
-	if !h.isValidRedirectURI(clientRedirectURI) {
-		log.Printf("SECURITY: Invalid redirect URI rejected: %s from %s", clientRedirectURI, r.RemoteAddr)
+	// Determine redirect URI strategy based on configuration
+	var redirectURI string
+	hasFixedRedirect := h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",")
+
+	if hasFixedRedirect {
+		// Fixed redirect mode: Use server's redirect URI to OAuth provider, proxy back to client
+		redirectURI = strings.TrimSpace(h.config.RedirectURIs)
+		log.Printf("OAuth2: Fixed redirect mode - using server URI: %s (will proxy to client: %s)", redirectURI, clientRedirectURI)
+
+		// Validate client redirect URI format and security
+		if clientRedirectURI == "" {
+			log.Printf("SECURITY: Missing client redirect URI")
+			http.Error(w, "Missing redirect_uri", http.StatusBadRequest)
+			return
+		}
+
+		parsedURI, err := url.Parse(clientRedirectURI)
+		if err != nil {
+			log.Printf("SECURITY: Invalid client redirect URI format: %s", clientRedirectURI)
+			http.Error(w, "Invalid redirect_uri format", http.StatusBadRequest)
+			return
+		}
+
+		// Additional security checks for client redirect URI
+		if parsedURI.Scheme != "http" && parsedURI.Scheme != "https" {
+			log.Printf("SECURITY: Invalid redirect URI scheme: %s (must be http or https)", parsedURI.Scheme)
+			http.Error(w, "Invalid redirect_uri scheme", http.StatusBadRequest)
+			return
+		}
+
+		// Enforce HTTPS for non-localhost URIs
+		if parsedURI.Scheme == "http" && !isLocalhostURI(clientRedirectURI) {
+			log.Printf("SECURITY: HTTP redirect URI not allowed for non-localhost: %s", clientRedirectURI)
+			http.Error(w, "HTTPS required for non-localhost redirect_uri", http.StatusBadRequest)
+			return
+		}
+
+		// Prevent fragment in redirect URI (OAuth 2.0 spec)
+		if parsedURI.Fragment != "" {
+			log.Printf("SECURITY: Redirect URI contains fragment: %s", clientRedirectURI)
+			http.Error(w, "redirect_uri must not contain fragment", http.StatusBadRequest)
+			return
+		}
+
+		// Security: For fixed redirect mode, only allow localhost or loopback addresses
+		// This prevents open redirect attacks while still supporting development tools
+		if !isLocalhostURI(clientRedirectURI) {
+			log.Printf("SECURITY: Fixed redirect mode only allows localhost URIs, rejecting: %s from %s", clientRedirectURI, r.RemoteAddr)
+			http.Error(w, "Fixed redirect mode only allows localhost redirect URIs for security. Use allowlist mode for production.", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("OAuth2: Validated localhost redirect URI for proxy: %s", clientRedirectURI)
+	} else if h.config.RedirectURIs != "" {
+		// Allowlist mode: Client's URI must be in allowlist, used directly (no proxy)
+		if !h.isValidRedirectURI(clientRedirectURI) {
+			log.Printf("SECURITY: Redirect URI not in allowlist: %s from %s", clientRedirectURI, r.RemoteAddr)
+			http.Error(w, "Invalid redirect_uri", http.StatusBadRequest)
+			return
+		}
+		redirectURI = clientRedirectURI
+		log.Printf("OAuth2: Allowlist mode - using client URI from allowlist: %s", redirectURI)
+	} else {
+		// No configuration: Reject for security
+		log.Printf("SECURITY: No redirect URIs configured, rejecting: %s from %s", clientRedirectURI, r.RemoteAddr)
 		http.Error(w, "Invalid redirect_uri", http.StatusBadRequest)
 		return
-	}
-
-	// Set redirect URI - use fixed URI if configured, otherwise use client's URI
-	redirectURI := clientRedirectURI
-	if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
-		redirectURI = strings.TrimSpace(h.config.RedirectURIs)
-		log.Printf("OAuth2: Using fixed redirect URI: %s (overriding client's %s)", redirectURI, clientRedirectURI)
 	}
 
 	// Update OAuth2 config with redirect URI
 	h.oauth2Config.RedirectURL = redirectURI
 
-	// Create authorization URL with PKCE
-	authURL := h.oauth2Config.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	// For fixed redirect mode, create signed state with client redirect URI
+	actualState := state
+	if hasFixedRedirect {
+		// Create state data with redirect URI
+		stateData := map[string]string{
+			"state":    state,
+			"redirect": clientRedirectURI,
+		}
 
-	// Add PKCE parameters to the URL
+		// Sign state for integrity protection
+		signedState, err := h.signState(stateData)
+		if err != nil {
+			log.Printf("OAuth2: Failed to sign state: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		actualState = signedState
+		log.Printf("OAuth2: Signed state for proxy callback (length: %d)", len(signedState))
+	}
+
+	// Create authorization URL
+	authURL := h.oauth2Config.AuthCodeURL(actualState, oauth2.AccessTypeOffline)
+
+	// Add PKCE parameters to the URL if provided
 	if codeChallenge != "" {
 		parsedURL, err := url.Parse(authURL)
 		if err != nil {
@@ -290,24 +388,6 @@ func (h *OAuth2Handler) HandleAuthorize(w http.ResponseWriter, r *http.Request) 
 		query := parsedURL.Query()
 		query.Set("code_challenge", codeChallenge)
 		query.Set("code_challenge_method", codeChallengeMethod)
-
-		// If using fixed redirect URI, encode original client URI in state
-		if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
-			// Encode state and redirect URI safely using JSON + base64
-			stateData := map[string]string{
-				"state":    state,
-				"redirect": clientRedirectURI,
-			}
-			jsonData, err := json.Marshal(stateData)
-			if err != nil {
-				log.Printf("OAuth2: Failed to encode state data: %v", err)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-				return
-			}
-			encodedState := base64.URLEncoding.EncodeToString(jsonData)
-			query.Set("state", encodedState)
-			log.Printf("OAuth2: Encoded state for proxy callback (length: %d)", len(encodedState))
-		}
 
 		parsedURL.RawQuery = query.Encode()
 		authURL = parsedURL.String()
@@ -354,48 +434,41 @@ func (h *OAuth2Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 
 	// If using fixed redirect URI, handle proxy callback
 	if h.config.RedirectURIs != "" && !strings.Contains(h.config.RedirectURIs, ",") {
-		// Try to decode the state parameter
-		jsonData, err := base64.URLEncoding.DecodeString(state)
-		if err == nil {
-			var stateData map[string]string
-			if err := json.Unmarshal(jsonData, &stateData); err == nil {
-				if originalState, ok := stateData["state"]; ok {
-					if originalRedirectURI, ok := stateData["redirect"]; ok {
-						log.Printf("OAuth2: Proxying callback to original client: %s", originalRedirectURI)
-
-						// Build proxy callback URL
-						proxyURL := fmt.Sprintf("%s?code=%s&state=%s", originalRedirectURI, code, originalState)
-						http.Redirect(w, r, proxyURL, http.StatusFound)
-						return
-					}
-				}
-			}
+		// Verify and decode signed state parameter
+		stateData, err := h.verifyState(state)
+		if err != nil {
+			log.Printf("SECURITY: State verification failed: %v", err)
+			http.Error(w, "Invalid state parameter", http.StatusBadRequest)
+			return
 		}
 
-		// Fallback: try legacy pipe-delimited format for backward compatibility
-		if strings.Contains(state, "|") {
-			parts := strings.SplitN(state, "|", 2)
-			if len(parts) == 2 {
-				// Validate that neither part contains additional pipes
-				if strings.Contains(parts[0], "|") || strings.Contains(parts[1], "|") {
-					log.Printf("OAuth2: Invalid legacy state format detected")
-					h.showSuccessPage(w, code, state)
-					return
-				}
-				originalState := parts[0]
-				originalRedirectURI := parts[1]
+		// Extract original state and redirect URI
+		originalState, hasState := stateData["state"]
+		originalRedirectURI, hasRedirect := stateData["redirect"]
 
-				log.Printf("OAuth2: Proxying callback to original client (legacy format): %s", originalRedirectURI)
-
-				// Build proxy callback URL
-				proxyURL := fmt.Sprintf("%s?code=%s&state=%s", originalRedirectURI, code, originalState)
-				http.Redirect(w, r, proxyURL, http.StatusFound)
+		if hasState && hasRedirect {
+			// Re-validate redirect URI for defense in depth
+			// Even though state is HMAC-signed, validate the redirect URI is localhost
+			if !isLocalhostURI(originalRedirectURI) {
+				log.Printf("SECURITY: Callback redirect URI is not localhost (possible key compromise): %s", originalRedirectURI)
+				http.Error(w, "Invalid redirect URI in state", http.StatusBadRequest)
 				return
 			}
+
+			log.Printf("OAuth2: State verified, proxying callback to localhost client: %s", originalRedirectURI)
+
+			// Build proxy callback URL
+			proxyURL := fmt.Sprintf("%s?code=%s&state=%s", originalRedirectURI, code, originalState)
+			http.Redirect(w, r, proxyURL, http.StatusFound)
+			return
 		}
+
+		log.Printf("OAuth2: State missing required fields")
+		http.Error(w, "Invalid state format", http.StatusBadRequest)
+		return
 	}
 
-	// Fallback: show success page
+	// For non-fixed redirect mode or as fallback, show success page
 	h.showSuccessPage(w, code, state)
 }
 
@@ -603,6 +676,86 @@ func getEnv(key, def string) string {
 		return v
 	}
 	return def
+}
+
+// signState signs state data with HMAC-SHA256 for integrity protection
+func (h *OAuth2Handler) signState(stateData map[string]string) (string, error) {
+	// Create deterministic string for signing
+	dataToSign := ""
+	if state, ok := stateData["state"]; ok {
+		dataToSign += "state=" + state + "&"
+	}
+	if redirect, ok := stateData["redirect"]; ok {
+		dataToSign += "redirect=" + redirect
+	}
+
+	// Create HMAC signature
+	mac := hmac.New(sha256.New, h.config.stateSigningKey)
+	mac.Write([]byte(dataToSign))
+	signature := hex.EncodeToString(mac.Sum(nil))
+
+	// Add signature to state data
+	stateData["sig"] = signature
+	signedData, err := json.Marshal(stateData)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal signed state: %w", err)
+	}
+
+	// Base64 encode for URL safety
+	return base64.URLEncoding.EncodeToString(signedData), nil
+}
+
+// verifyState verifies and decodes HMAC-signed state parameter
+func (h *OAuth2Handler) verifyState(encodedState string) (map[string]string, error) {
+	// Base64 decode
+	decodedState, err := base64.URLEncoding.DecodeString(encodedState)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode state: %w", err)
+	}
+
+	// Unmarshal state data
+	var stateData map[string]string
+	if err := json.Unmarshal(decodedState, &stateData); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal state: %w", err)
+	}
+
+	// Extract signature
+	receivedSig, ok := stateData["sig"]
+	if !ok {
+		return nil, fmt.Errorf("state missing signature")
+	}
+	delete(stateData, "sig") // Remove for verification
+
+	// Recalculate signature using same deterministic approach
+	dataToSign := ""
+	if state, ok := stateData["state"]; ok {
+		dataToSign += "state=" + state + "&"
+	}
+	if redirect, ok := stateData["redirect"]; ok {
+		dataToSign += "redirect=" + redirect
+	}
+
+	mac := hmac.New(sha256.New, h.config.stateSigningKey)
+	mac.Write([]byte(dataToSign))
+	expectedSig := hex.EncodeToString(mac.Sum(nil))
+
+	// Verify signature using constant-time comparison
+	if !hmac.Equal([]byte(receivedSig), []byte(expectedSig)) {
+		return nil, fmt.Errorf("invalid state signature - possible tampering detected")
+	}
+
+	return stateData, nil
+}
+
+// isLocalhostURI checks if URI is localhost for development
+func isLocalhostURI(uri string) bool {
+	parsedURI, err := url.Parse(uri)
+	if err != nil {
+		return false
+	}
+
+	hostname := strings.ToLower(parsedURI.Hostname())
+	return hostname == "localhost" || hostname == "127.0.0.1" || hostname == "::1"
 }
 
 // isValidRedirectURI validates redirect URI against allowlist for security
