@@ -27,11 +27,13 @@ data:
   {{- if .Values.trino.allowlists.tables }}
   TRINO_ALLOWED_TABLES: {{ .Values.trino.allowlists.tables | join "," | quote }}
   {{- end }}
-  TRINO_OAUTH_ENABLED: {{ .Values.trino.oauth.enabled | quote }}
+  OAUTH_ENABLED: {{ .Values.trino.oauth.enabled | quote }}
   {{- if .Values.trino.oauth.enabled }}
+  OAUTH_MODE: {{ .Values.trino.oauth.mode | quote }}
   OAUTH_PROVIDER: {{ .Values.trino.oauth.provider | quote }}
-  {{- if .Values.trino.oauth.redirectURI }}
-  OAUTH_REDIRECT_URI: {{ .Values.trino.oauth.redirectURI | quote }}
+  {{- if .Values.trino.oauth.redirectURIs }}
+  OAUTH_REDIRECT_URI: {{ .Values.trino.oauth.redirectURIs | quote }}
+  OAUTH_ALLOWED_REDIRECT_URIS: {{ .Values.trino.oauth.redirectURIs | quote }}
   {{- end }}
   {{- if .Values.trino.oauth.oidc.issuer }}
   OIDC_ISSUER: {{ .Values.trino.oauth.oidc.issuer | quote }}

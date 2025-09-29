@@ -26,6 +26,7 @@ type TrinoConfig struct {
 
 	// OAuth mode configuration
 	OAuthEnabled  bool   // Enable OAuth 2.1 authentication
+	OAuthMode     string // OAuth operational mode: "native" or "proxy"
 	OAuthProvider string // OAuth provider: "hmac", "okta", "google", "azure"
 	JWTSecret     string // JWT signing secret for HMAC provider
 
@@ -33,8 +34,8 @@ type TrinoConfig struct {
 	OIDCIssuer       string // OIDC issuer URL
 	OIDCAudience     string // OIDC audience
 	OIDCClientID     string // OIDC client ID
-	OIDCClientSecret string // OIDC client secret
-	OAuthRedirectURI string // Fixed OAuth redirect URI (overrides dynamic callback)
+	OIDCClientSecret       string // OIDC client secret
+	OAuthRedirectURIs      string // OAuth redirect URIs - single URI or comma-separated list
 
 	// Allowlist configuration for filtering catalogs, schemas, and tables
 	AllowedCatalogs []string // List of allowed catalogs (empty means no filtering)
@@ -50,6 +51,9 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 	scheme := getEnv("TRINO_SCHEME", "https")
 	allowWriteQueries, _ := strconv.ParseBool(getEnv("TRINO_ALLOW_WRITE_QUERIES", "false"))
 
+	// OAuth mode configuration: native (default) or proxy
+	oauthMode := strings.ToLower(getEnv("OAUTH_MODE", "native"))
+
 	// Smart OAuth detection: if OAUTH_PROVIDER is explicitly set, enable OAuth
 	oauthProvider := strings.ToLower(getEnv("OAUTH_PROVIDER", ""))
 	oauthEnabled := false
@@ -60,15 +64,15 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		log.Printf("INFO: OAuth automatically enabled because OAUTH_PROVIDER=%s is set", oauthProvider)
 
 		// Allow explicit override if needed
-		if explicitEnabled := os.Getenv("TRINO_OAUTH_ENABLED"); explicitEnabled != "" {
+		if explicitEnabled := os.Getenv("OAUTH_ENABLED"); explicitEnabled != "" {
 			oauthEnabled, _ = strconv.ParseBool(explicitEnabled)
 			if !oauthEnabled {
-				log.Printf("WARNING: OAuth explicitly disabled via TRINO_OAUTH_ENABLED=false despite OAUTH_PROVIDER being set")
+				log.Printf("WARNING: OAuth explicitly disabled via OAUTH_ENABLED=false despite OAUTH_PROVIDER being set")
 			}
 		}
 	} else {
-		// No OAUTH_PROVIDER set, check TRINO_OAUTH_ENABLED (defaults to false)
-		oauthEnabled, _ = strconv.ParseBool(getEnv("TRINO_OAUTH_ENABLED", "false"))
+		// No OAUTH_PROVIDER set, check OAUTH_ENABLED (defaults to false)
+		oauthEnabled, _ = strconv.ParseBool(getEnv("OAUTH_ENABLED", "false"))
 		oauthProvider = "hmac" // Default provider when OAuth is enabled without explicit provider
 	}
 	jwtSecret := getEnv("JWT_SECRET", "")
@@ -78,7 +82,15 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 	oidcAudience := getEnv("OIDC_AUDIENCE", "") // No default - must be explicitly configured
 	oidcClientID := getEnv("OIDC_CLIENT_ID", "")
 	oidcClientSecret := getEnv("OIDC_CLIENT_SECRET", "")
-	oauthRedirectURI := getEnv("OAUTH_REDIRECT_URI", "")
+	oauthRedirectURIs := getEnv("OAUTH_REDIRECT_URI", "")
+	oauthAllowedRedirects := getEnv("OAUTH_ALLOWED_REDIRECT_URIS", "")
+
+	// Prioritize OAUTH_REDIRECT_URI, but warn if both are set with different values
+	if oauthRedirectURIs != "" && oauthAllowedRedirects != "" && oauthRedirectURIs != oauthAllowedRedirects {
+		log.Printf("WARNING: Both OAUTH_REDIRECT_URI and OAUTH_ALLOWED_REDIRECT_URIS are set with different values. Using OAUTH_REDIRECT_URI: %s", oauthRedirectURIs)
+	} else if oauthRedirectURIs == "" {
+		oauthRedirectURIs = oauthAllowedRedirects
+	}
 
 	// Parse query timeout from environment variable
 	const defaultTimeout = 30
@@ -120,6 +132,12 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		log.Println("WARNING: Write queries are enabled (TRINO_ALLOW_WRITE_QUERIES=true). SQL injection protection is bypassed.")
 	}
 
+	// Validate OAuth mode
+	validModes := map[string]bool{"native": true, "proxy": true}
+	if !validModes[oauthMode] {
+		return nil, fmt.Errorf("invalid OAuth mode '%s'. Supported modes: native, proxy", oauthMode)
+	}
+
 	// Validate and log OAuth mode status
 	if oauthEnabled {
 		// Validate OAuth provider
@@ -128,7 +146,7 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 			return nil, fmt.Errorf("invalid OAuth provider '%s'. Supported providers: hmac, okta, google, azure", oauthProvider)
 		}
 
-		log.Printf("INFO: OAuth 2.1 authentication enabled (TRINO_OAUTH_ENABLED=true) with provider: %s", oauthProvider)
+		log.Printf("INFO: OAuth 2.1 authentication enabled (mode: %s, provider: %s)", oauthMode, oauthProvider)
 		if oauthProvider == "hmac" && jwtSecret == "" {
 			return nil, fmt.Errorf("security error: JWT_SECRET is required when using HMAC provider. Set JWT_SECRET environment variable")
 		}
@@ -141,14 +159,24 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 			return nil, fmt.Errorf("security error: OIDC_AUDIENCE is required for %s provider. Set OIDC_AUDIENCE environment variable to your service-specific audience", oauthProvider)
 		}
 
+		// Validate proxy mode specific requirements
+		if oauthMode == "proxy" {
+			if oauthProvider != "hmac" && oidcClientSecret == "" {
+				log.Printf("WARNING: OIDC_CLIENT_SECRET not set for proxy mode with %s provider. OAuth flow may fail.", oauthProvider)
+			}
+			if oauthRedirectURIs == "" {
+				log.Printf("WARNING: No OAuth redirect URIs configured for proxy mode. All redirects will be rejected for security.")
+			}
+		}
+
 		if oauthProvider != "hmac" {
 			log.Printf("INFO: JWT audience validation enabled for: %s", oidcAudience)
 		}
-		if oauthRedirectURI != "" {
-			log.Printf("INFO: Fixed OAuth redirect URI configured: %s", oauthRedirectURI)
+		if oauthRedirectURIs != "" {
+			log.Printf("INFO: OAuth redirect URIs configured: %s", oauthRedirectURIs)
 		}
 	} else {
-		log.Println("INFO: OAuth authentication is disabled (TRINO_OAUTH_ENABLED=false). Enable OAuth for production deployments.")
+		log.Println("INFO: OAuth authentication is disabled (OAUTH_ENABLED=false). Enable OAuth for production deployments.")
 	}
 
 	// Log allowlist configuration
@@ -167,13 +195,14 @@ func NewTrinoConfig() (*TrinoConfig, error) {
 		AllowWriteQueries: allowWriteQueries,
 		QueryTimeout:      queryTimeout,
 		OAuthEnabled:      oauthEnabled,
+		OAuthMode:         oauthMode,
 		OAuthProvider:     oauthProvider,
 		JWTSecret:         jwtSecret,
 		OIDCIssuer:        oidcIssuer,
 		OIDCAudience:      oidcAudience,
 		OIDCClientID:      oidcClientID,
-		OIDCClientSecret:  oidcClientSecret,
-		OAuthRedirectURI:  oauthRedirectURI,
+		OIDCClientSecret:     oidcClientSecret,
+		OAuthRedirectURIs:    oauthRedirectURIs,
 		AllowedCatalogs:   allowedCatalogs,
 		AllowedSchemas:    allowedSchemas,
 		AllowedTables:     allowedTables,
