@@ -46,9 +46,11 @@ func NewClient(cfg *config.TrinoConfig) (*Client, error) {
 	}
 
 	// Set connection pool parameters
+	// Set connection lifetime to be longer than query timeout to avoid premature disconnections
+	connLifetime := max(cfg.QueryTimeout*2, 5*time.Minute)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
+	db.SetConnMaxLifetime(connLifetime)
 
 	// Test the connection
 	if err := db.Ping(); err != nil {
