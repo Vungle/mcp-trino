@@ -47,7 +47,7 @@ func NewClient(cfg *config.TrinoConfig) (*Client, error) {
 
 	// Set connection pool parameters
 	// Set connection lifetime to be longer than query timeout to avoid premature disconnections
-	connLifetime := max(cfg.QueryTimeout*2, 5*time.Minute)
+	connLifetime := max(cfg.QueryTimeout*2, 6*time.Minute)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(connLifetime)
@@ -87,7 +87,6 @@ func isReadOnlyQuery(query string) bool {
 
 	// Remove string literals and comments to avoid false positives
 	queryLower = sanitizeQueryForKeywordDetection(queryLower)
-
 
 	// First check for SQL injection attempts with multiple statements
 	if strings.Contains(queryLower, ";") {
