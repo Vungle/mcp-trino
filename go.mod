@@ -1,6 +1,6 @@
 module github.com/tuannvm/mcp-trino
 
-go 1.24.2
+go 1.24.9
 
 require (
 	github.com/mark3labs/mcp-go v0.42.0
