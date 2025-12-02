@@ -12,10 +12,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Vungle/mcp-trino/internal/config"
+	"github.com/Vungle/mcp-trino/internal/trino"
+	oauth "github.com/Vungle/oauth-mcp-proxy"
 	mcpserver "github.com/mark3labs/mcp-go/server"
-	oauth "github.com/tuannvm/oauth-mcp-proxy"
-	"github.com/tuannvm/mcp-trino/internal/config"
-	"github.com/tuannvm/mcp-trino/internal/trino"
 )
 
 // Server represents the MCP server with all components
@@ -253,7 +253,6 @@ func (s *Server) getOAuthStatusWithWarning() string {
 	}
 	return " (OAuth disabled)"
 }
-
 
 func trinoConfigToOAuthConfig(cfg *config.TrinoConfig) *oauth.Config {
 	serverURL := getEnv("MCP_URL", "")

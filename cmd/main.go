@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tuannvm/mcp-trino/internal/config"
-	"github.com/tuannvm/mcp-trino/internal/mcp"
-	"github.com/tuannvm/mcp-trino/internal/trino"
+	"github.com/Vungle/mcp-trino/internal/config"
+	"github.com/Vungle/mcp-trino/internal/mcp"
+	"github.com/Vungle/mcp-trino/internal/trino"
 )
 
 // These variables will be set during the build via ldflags

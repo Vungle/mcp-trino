@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Vungle/mcp-trino/internal/trino"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
-	"github.com/tuannvm/mcp-trino/internal/trino"
 )
 
 // TrinoHandlers contains all handlers for Trino-related tools
