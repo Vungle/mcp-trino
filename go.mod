@@ -1,6 +1,6 @@
 module github.com/Vungle/mcp-trino
 
-go 1.24.9
+go 1.24.11
 
 require (
 	github.com/Vungle/oauth-mcp-proxy v1.0.2-alpha-1
