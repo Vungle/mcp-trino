@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Vungle/mcp-trino/internal/config"
 	_ "github.com/trinodb/trino-go-client/trino"
-	"github.com/tuannvm/mcp-trino/internal/config"
 )
 
 // Client is a wrapper around Trino client

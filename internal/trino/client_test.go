@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tuannvm/mcp-trino/internal/config"
+	"github.com/Vungle/mcp-trino/internal/config"
 )
 
 func TestFilterCatalogs(t *testing.T) {
