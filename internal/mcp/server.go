@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"os/signal"
 	"strings"
@@ -90,7 +91,7 @@ func (s *Server) ServeHTTP(port string) error {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/status", s.handleStatus)
+	mux.HandleFunc("/status", s.LogRequestMiddleware(s.handleStatus))
 
 	if s.config.OAuthEnabled && s.oauthServer != nil {
 		s.oauthServer.RegisterHandlers(mux)
@@ -98,8 +99,8 @@ func (s *Server) ServeHTTP(port string) error {
 	}
 
 	mcpHandler := s.createMCPHandler(streamableServer)
-	mux.HandleFunc("/mcp", mcpHandler)
-	mux.HandleFunc("/sse", mcpHandler)
+	mux.HandleFunc("/mcp", s.LogRequestMiddleware(mcpHandler))
+	mux.HandleFunc("/sse", s.LogRequestMiddleware(mcpHandler))
 
 	httpServer := &http.Server{Addr: addr, Handler: mux}
 
@@ -164,6 +165,16 @@ func (s *Server) ServeHTTP(port string) error {
 	}
 	log.Println("HTTP server shutdown completed gracefully")
 	return nil
+}
+
+// LogRequestMiddleware creates a server-level authentication hook for all MCP requests.
+func (s *Server) LogRequestMiddleware(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer log.Printf(fmt.Sprintf("Log Request:\nRequest: %+v\nResponse: %+v\n", r, w))
+		req, _ := httputil.DumpRequest(r, true)
+		log.Printf("\nLog Request dumped = %q\n", req)
+		next(w, r)
+	}
 }
 
 // createMCPHandler creates the shared MCP handler function
