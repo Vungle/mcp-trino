@@ -1,11 +1,13 @@
 package trino
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/Vungle/mcp-trino/internal/config"
+	oauth "github.com/Vungle/oauth-mcp-proxy"
 )
 
 func TestFilterCatalogs(t *testing.T) {
@@ -439,4 +441,57 @@ func TestImprovedIsReadOnlyQuery(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetQueryUsername(t *testing.T) {
+	tests := []struct {
+		name     string
+		user     *oauth.User
+		expected string
+	}{
+		{
+			name:     "User with email",
+			user:     &oauth.User{Email: "abc@example.com"},
+			expected: "abc@example.com",
+		},
+		{
+			name:     "User with username",
+			user:     &oauth.User{Username: "abc@example.com"},
+			expected: "abc@example.com",
+		},
+		{
+			name:     "User with username and email",
+			user:     &oauth.User{Username: "abc@example.com", Email: "def@example.com"},
+			expected: "abc@example.com",
+		},
+		{
+			name:     "User with subject",
+			user:     &oauth.User{Subject: "abc@example.com"},
+			expected: "abc@example.com",
+		},
+		{
+			name:     "Empty User",
+			user:     &oauth.User{},
+			expected: "mcp-trino-user",
+		},
+		{
+			name:     "Nil User",
+			user:     nil,
+			expected: "mcp-trino-user",
+		},
+	}
+	for index := range tests {
+		t.Run(tests[index].name, func(t *testing.T) {
+			ctx := context.Background()
+			tt := tests[index]
+			if tt.user != nil {
+				ctx = oauth.WithUser(ctx, tt.user)
+			}
+			result := getQueryUsername(ctx)
+			if result != tt.expected {
+				t.Errorf("getQueryUsername(%v) = %s, want %s", tt.user, result, tt.expected)
+			}
+		})
+	}
+
 }
