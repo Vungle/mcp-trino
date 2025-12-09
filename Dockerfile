@@ -9,7 +9,6 @@ FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies in a separate layer for better caching
-RUN apk update
 RUN apk add --no-cache git
 
 # Copy go mod and sum files first (better layer caching)
@@ -30,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # Use a small image for the final container (explicit target platform)
 FROM --platform=$TARGETPLATFORM alpine:latest
-
+RUN apk update
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
