@@ -29,8 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # Use a small image for the final container (explicit target platform)
 FROM --platform=$TARGETPLATFORM alpine:latest
-RUN apk update
-RUN apk --no-cache add ca-certificates
+RUN apk update && apk --no-cache add ca-certificates
 
 WORKDIR /app
 
