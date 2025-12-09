@@ -9,6 +9,7 @@ FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies in a separate layer for better caching
+RUN apk update
 RUN apk add --no-cache git
 
 # Copy go mod and sum files first (better layer caching)
