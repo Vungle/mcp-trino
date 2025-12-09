@@ -256,7 +256,9 @@ func (c *Client) ExecuteQuery(ctx context.Context, query string) ([]map[string]i
 	rows, err := c.db.QueryContext(
 		ctx,
 		query,
-		sql.Named("X-Trino-User", userName),
+		sql.Named("X-Trino-Client-Tags", userName),
+		sql.Named("X-Trino-Client-Info", userName),
+		sql.Named("X-Trino-Source", userName),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("query execution failed: %w", err)
