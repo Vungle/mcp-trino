@@ -14,8 +14,8 @@ import (
 
 	"github.com/Vungle/mcp-trino/internal/config"
 	"github.com/Vungle/mcp-trino/internal/trino"
-	oauth "github.com/Vungle/oauth-mcp-proxy"
 	mcpserver "github.com/mark3labs/mcp-go/server"
+	oauth "github.com/tuannvm/oauth-mcp-proxy"
 )
 
 // Server represents the MCP server with all components

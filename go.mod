@@ -1,11 +1,11 @@
 module github.com/Vungle/mcp-trino
 
-go 1.24.11
+go 1.24.9
 
 require (
-	github.com/Vungle/oauth-mcp-proxy v1.0.3
 	github.com/mark3labs/mcp-go v0.42.0
 	github.com/trinodb/trino-go-client v0.328.0
+	github.com/tuannvm/oauth-mcp-proxy v1.0.0
 )
 
 require (
