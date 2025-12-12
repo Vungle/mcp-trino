@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Vungle/mcp-trino/internal/config"
+	oauth "github.com/Vungle/oauth-mcp-proxy"
 	_ "github.com/trinodb/trino-go-client/trino"
 )
 
@@ -217,8 +218,26 @@ func sanitizeQueryForKeywordDetection(query string) string {
 	return strings.TrimSpace(query)
 }
 
+// getQueryUsername returns the username of the user executing the query if present in context
+func getQueryUsername(ctx context.Context) string {
+	user, exists := oauth.GetUserFromContext(ctx)
+	if !exists || user == nil {
+		return "mcp-trino-user"
+	}
+	if user.Username != "" {
+		return user.Username
+	}
+	if user.Email != "" {
+		return user.Email
+	}
+	if user.Subject != "" {
+		return user.Subject
+	}
+	return "mcp-trino-user"
+}
+
 // ExecuteQuery executes a SQL query and returns the results
-func (c *Client) ExecuteQuery(query string) ([]map[string]interface{}, error) {
+func (c *Client) ExecuteQuery(ctx context.Context, query string) ([]map[string]interface{}, error) {
 	// Strip trailing semicolon that Trino doesn't allow
 	query = strings.TrimSuffix(strings.TrimSpace(query), ";")
 
@@ -227,12 +246,20 @@ func (c *Client) ExecuteQuery(query string) ([]map[string]interface{}, error) {
 		return nil, fmt.Errorf("security restriction: only SELECT, SHOW, DESCRIBE, and EXPLAIN queries are allowed. " +
 			"Set TRINO_ALLOW_WRITE_QUERIES=true to enable write operations (at your own risk)")
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
-	defer cancel()
-
+	// get User from context - if present
+	userName := getQueryUsername(ctx)
 	// Execute the query
-	rows, err := c.db.QueryContext(ctx, query)
+	// To pass per-query user information to Trino,
+	// you have to add a NamedArg to the query parameters where the key is X-Trino-User.
+	// This parameter is used by the driver to inform Trino about the user executing the query
+	// regardless of the authentication method for the actual connection, and its value is NOT passed to the query.
+	rows, err := c.db.QueryContext(
+		ctx,
+		query,
+		sql.Named("X-Trino-Client-Tags", userName),
+		sql.Named("X-Trino-Client-Info", userName),
+		sql.Named("X-Trino-Source", userName),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
@@ -287,8 +314,8 @@ func (c *Client) ExecuteQuery(query string) ([]map[string]interface{}, error) {
 }
 
 // ListCatalogs returns a list of available catalogs
-func (c *Client) ListCatalogs() ([]string, error) {
-	results, err := c.ExecuteQuery("SHOW CATALOGS")
+func (c *Client) ListCatalogs(ctx context.Context) ([]string, error) {
+	results, err := c.ExecuteQuery(ctx, "SHOW CATALOGS")
 	if err != nil {
 		return nil, err
 	}
@@ -309,13 +336,13 @@ func (c *Client) ListCatalogs() ([]string, error) {
 }
 
 // ListSchemas returns a list of schemas in the specified catalog
-func (c *Client) ListSchemas(catalog string) ([]string, error) {
+func (c *Client) ListSchemas(ctx context.Context, catalog string) ([]string, error) {
 	if catalog == "" {
 		catalog = c.config.Catalog
 	}
 
 	query := fmt.Sprintf("SHOW SCHEMAS FROM %s", catalog)
-	results, err := c.ExecuteQuery(query)
+	results, err := c.ExecuteQuery(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -336,7 +363,7 @@ func (c *Client) ListSchemas(catalog string) ([]string, error) {
 }
 
 // ListTables returns a list of tables in the specified catalog and schema
-func (c *Client) ListTables(catalog, schema string) ([]string, error) {
+func (c *Client) ListTables(ctx context.Context, catalog string, schema string) ([]string, error) {
 	if catalog == "" {
 		catalog = c.config.Catalog
 	}
@@ -345,7 +372,7 @@ func (c *Client) ListTables(catalog, schema string) ([]string, error) {
 	}
 
 	query := fmt.Sprintf("SHOW TABLES FROM %s.%s", catalog, schema)
-	results, err := c.ExecuteQuery(query)
+	results, err := c.ExecuteQuery(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +393,7 @@ func (c *Client) ListTables(catalog, schema string) ([]string, error) {
 }
 
 // GetTableSchema returns the schema of a table
-func (c *Client) GetTableSchema(catalog, schema, table string) ([]map[string]interface{}, error) {
+func (c *Client) GetTableSchema(ctx context.Context, catalog, schema, table string) ([]map[string]interface{}, error) {
 	// Resolve catalog/schema/table parameters first
 	parts := strings.Split(table, ".")
 	if len(parts) == 3 {
@@ -400,11 +427,11 @@ func (c *Client) GetTableSchema(catalog, schema, table string) ([]map[string]int
 
 	// Build and execute query with resolved parameters
 	query := fmt.Sprintf("DESCRIBE %s.%s.%s", catalog, schema, table)
-	return c.ExecuteQuery(query)
+	return c.ExecuteQuery(ctx, query)
 }
 
 // ExplainQuery returns the query execution plan for a given SQL query
-func (c *Client) ExplainQuery(query string, format string) ([]map[string]interface{}, error) {
+func (c *Client) ExplainQuery(ctx context.Context, query string, format string) ([]map[string]interface{}, error) {
 	// Build EXPLAIN query with optional TYPE format (LOGICAL|DISTRIBUTED|VALIDATE|IO)
 	explainQuery := "EXPLAIN"
 	if f := strings.ToUpper(strings.TrimSpace(format)); f != "" {
@@ -417,7 +444,7 @@ func (c *Client) ExplainQuery(query string, format string) ([]map[string]interfa
 	}
 	explainQuery = fmt.Sprintf("%s %s", explainQuery, query)
 
-	return c.ExecuteQuery(explainQuery)
+	return c.ExecuteQuery(ctx, explainQuery)
 }
 
 // sanitizeConnectionError removes sensitive information from connection errors
