@@ -22,7 +22,7 @@ permissions:
   checks: write
 
 env:
-  GO_VERSION: "1.24.11"
+  GO_VERSION: "1.25.8"
   REGISTRY: ghcr.io
 
 jobs:
@@ -101,6 +101,7 @@ jobs:
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH,MEDIUM"
           timeout: "10m"
+          version: "v0.69.3"
 
       - name: Upload security scan results
         uses: github/codeql-action/upload-sarif@v4

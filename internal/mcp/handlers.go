@@ -72,21 +72,33 @@ func (h *TrinoHandlers) ExecuteQuery(ctx context.Context, request mcp.CallToolRe
 	}
 
 	// Execute the query - SQL injection protection is handled within the client
-	results, err := h.TrinoClient.ExecuteQueryWithContext(ctx, query)
+	qr, err := h.TrinoClient.ExecuteQueryWithContext(ctx, query)
 	if err != nil {
 		log.Printf("Error executing query: %v", err)
 		mcpErr := fmt.Errorf("query execution failed: %w", err)
 		return mcp.NewToolResultErrorFromErr(mcpErr.Error(), mcpErr), nil
 	}
 
-	// Convert results to JSON string for display
-	jsonData, err := json.MarshalIndent(results, "", "  ")
+	// Build the bare JSON array as backward-compatible text content
+	// This preserves the original response format for older MCP clients
+	jsonData, err := json.MarshalIndent(qr.Rows, "", "  ")
 	if err != nil {
 		mcpErr := fmt.Errorf("failed to marshal results to JSON: %w", err)
 		return mcp.NewToolResultErrorFromErr(mcpErr.Error(), mcpErr), nil
 	}
 
-	// Return the results as formatted JSON text
+	// If truncated, use structuredContent (MCP 2025-06-18) for metadata
+	// while keeping the bare array in text content for backward compatibility
+	if qr.Truncated {
+		structured := map[string]interface{}{
+			"results":   qr.Rows,
+			"truncated": true,
+			"rowCount":  len(qr.Rows),
+			"message":   fmt.Sprintf("Result truncated to %d rows. Add LIMIT to your query or increase TRINO_MAX_ROWS.", qr.MaxRows),
+		}
+		return mcp.NewToolResultStructured(structured, string(jsonData)), nil
+	}
+
 	return mcp.NewToolResultText(string(jsonData)), nil
 }
 
@@ -220,7 +232,7 @@ func (h *TrinoHandlers) GetTableSchema(ctx context.Context, request mcp.CallTool
 	}
 	table = tableParam
 
-	tableSchema, err := h.TrinoClient.GetTableSchemaWithContext(ctx, catalog, schema, table)
+	qr, err := h.TrinoClient.GetTableSchemaWithContext(ctx, catalog, schema, table)
 	if err != nil {
 		log.Printf("Error getting table schema: %v", err)
 		mcpErr := fmt.Errorf("failed to get table schema: %w", err)
@@ -228,7 +240,7 @@ func (h *TrinoHandlers) GetTableSchema(ctx context.Context, request mcp.CallTool
 	}
 
 	// Convert table schema to JSON string for display
-	jsonData, err := json.MarshalIndent(tableSchema, "", "  ")
+	jsonData, err := json.MarshalIndent(qr.Rows, "", "  ")
 	if err != nil {
 		mcpErr := fmt.Errorf("failed to marshal table schema to JSON: %w", err)
 		return mcp.NewToolResultErrorFromErr(mcpErr.Error(), mcpErr), nil
@@ -264,7 +276,7 @@ func (h *TrinoHandlers) ExplainQuery(ctx context.Context, request mcp.CallToolRe
 	}
 
 	// Execute the explain query
-	results, err := h.TrinoClient.ExplainQueryWithContext(ctx, query, format)
+	qr, err := h.TrinoClient.ExplainQueryWithContext(ctx, query, format)
 	if err != nil {
 		log.Printf("Error explaining query: %v", err)
 		mcpErr := fmt.Errorf("query explanation failed: %w", err)
@@ -272,7 +284,7 @@ func (h *TrinoHandlers) ExplainQuery(ctx context.Context, request mcp.CallToolRe
 	}
 
 	// Convert results to JSON string for display
-	jsonData, err := json.MarshalIndent(results, "", "  ")
+	jsonData, err := json.MarshalIndent(qr.Rows, "", "  ")
 	if err != nil {
 		mcpErr := fmt.Errorf("failed to marshal explanation results to JSON: %w", err)
 		return mcp.NewToolResultErrorFromErr(mcpErr.Error(), mcpErr), nil
