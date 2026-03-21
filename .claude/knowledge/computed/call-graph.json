@@ -1,0 +1,2297 @@
+{
+  "generated": "2026-03-20T03:16:48Z",
+  "module": "github.com/Vungle/mcp-trino",
+  "total_edges": 254,
+  "total_functions": 153,
+  "edges": [
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.getEnv",
+      "caller_pkg": "cmd",
+      "callee": "os.LookupEnv",
+      "callee_pkg": "os",
+      "caller_file": "cmd/main.go",
+      "caller_line": 77
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "callee_pkg": "internal/trino"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "os.init",
+      "callee_pkg": "os"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "log.init",
+      "callee_pkg": "log"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "strings.init",
+      "callee_pkg": "strings"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "context.init",
+      "callee_pkg": "context"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.init",
+      "callee_pkg": "internal/config"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.init",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "callee_pkg": "internal/mcp"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "context.Background",
+      "callee_pkg": "context",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/cmd.getEnv",
+      "callee_pkg": "cmd",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.NewServer",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "strings.Join",
+      "callee_pkg": "strings",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListCatalogs",
+      "callee_pkg": "internal/trino",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeStdio",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/cmd.main$1",
+      "callee_pkg": "cmd",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "callee_pkg": "internal/trino",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "log.Fatalf",
+      "callee_pkg": "log",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "callee_pkg": "internal/config",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main",
+      "caller_pkg": "cmd",
+      "callee": "log.Println",
+      "callee_pkg": "log",
+      "caller_file": "cmd/main.go",
+      "caller_line": 22
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main$1",
+      "caller_pkg": "cmd",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "cmd/main.go",
+      "caller_line": 38
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/cmd.main$1",
+      "caller_pkg": "cmd",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).Close",
+      "callee_pkg": "internal/trino",
+      "caller_file": "cmd/main.go",
+      "caller_line": 38
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.escapeQuery",
+      "caller_pkg": "examples",
+      "callee": "strings.ReplaceAll",
+      "callee_pkg": "strings",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 133
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "io.ReadAll",
+      "callee_pkg": "io",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "encoding/json.Indent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "(*bytes.Buffer).String",
+      "callee_pkg": "bytes",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.executeQuery$1",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "net/http.Post",
+      "callee_pkg": "net/http",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.escapeQuery",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "caller_pkg": "examples",
+      "callee": "strings.NewReader",
+      "callee_pkg": "strings",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 51
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.executeQuery$1",
+      "caller_pkg": "examples",
+      "callee": "fmt.Printf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 59
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "io.init",
+      "callee_pkg": "io"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "log.init",
+      "callee_pkg": "log"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "bytes.init",
+      "callee_pkg": "bytes"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "net/http.init",
+      "callee_pkg": "net/http"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "fmt.init",
+      "callee_pkg": "fmt"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "strings.init",
+      "callee_pkg": "strings"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.init",
+      "caller_pkg": "examples",
+      "callee": "encoding/json.init",
+      "callee_pkg": "encoding/json"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listCatalogs",
+      "caller_pkg": "examples",
+      "callee": "encoding/json.Unmarshal",
+      "callee_pkg": "encoding/json",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 85
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listCatalogs",
+      "caller_pkg": "examples",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 85
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listCatalogs",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 85
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listSchemas",
+      "caller_pkg": "examples",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 109
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listSchemas",
+      "caller_pkg": "examples",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 109
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listSchemas",
+      "caller_pkg": "examples",
+      "callee": "encoding/json.Unmarshal",
+      "callee_pkg": "encoding/json",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 109
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.listSchemas",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 109
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "log.Fatalf",
+      "callee_pkg": "log",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "fmt.Println",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.listCatalogs",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "fmt.Printf",
+      "callee_pkg": "fmt",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.contains",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/examples.main",
+      "caller_pkg": "examples",
+      "callee": "github.com/Vungle/mcp-trino/examples.listSchemas",
+      "callee_pkg": "examples",
+      "caller_file": "examples/test_query.go",
+      "caller_line": 18
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "strconv.Atoi",
+      "callee_pkg": "strconv",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.getEnv",
+      "callee_pkg": "internal/config",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "strconv.ParseBool",
+      "callee_pkg": "strconv",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "strings.ToLower",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "strconv.Itoa",
+      "callee_pkg": "strconv",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "log.Println",
+      "callee_pkg": "log",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.parseAllowlist",
+      "callee_pkg": "internal/config",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.validateAllowlist",
+      "callee_pkg": "internal/config",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "strings.EqualFold",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.NewTrinoConfig",
+      "caller_pkg": "internal/config",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.logAllowlistConfiguration",
+      "callee_pkg": "internal/config",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 47
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.getEnv",
+      "caller_pkg": "internal/config",
+      "callee": "os.LookupEnv",
+      "callee_pkg": "os",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 213
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "strings.init",
+      "callee_pkg": "strings"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "fmt.init",
+      "callee_pkg": "fmt"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "log.init",
+      "callee_pkg": "log"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "os.init",
+      "callee_pkg": "os"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "strconv.init",
+      "callee_pkg": "strconv"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.init",
+      "caller_pkg": "internal/config",
+      "callee": "time.init",
+      "callee_pkg": "time"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.logAllowlistConfiguration",
+      "caller_pkg": "internal/config",
+      "callee": "log.Println",
+      "callee_pkg": "log",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 195
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.logAllowlistConfiguration",
+      "caller_pkg": "internal/config",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 195
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.logAllowlistConfiguration",
+      "caller_pkg": "internal/config",
+      "callee": "strings.Join",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 195
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.parseAllowlist",
+      "caller_pkg": "internal/config",
+      "callee": "strings.TrimSpace",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 165
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.parseAllowlist",
+      "caller_pkg": "internal/config",
+      "callee": "strings.Split",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 165
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.validateAllowlist",
+      "caller_pkg": "internal/config",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 183
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/config.validateAllowlist",
+      "caller_pkg": "internal/config",
+      "callee": "strings.Count",
+      "callee_pkg": "strings",
+      "caller_file": "internal/config/config.go",
+      "caller_line": 183
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP$1",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/oauth-mcp-proxy.Server).RegisterHandlers",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*net/http.ServeMux).HandleFunc",
+      "callee_pkg": "net/http",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "net/http.NewServeMux",
+      "callee_pkg": "net/http",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.NewStreamableHTTPServer",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.WithStateLess",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.WithHTTPContextFunc",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/oauth-mcp-proxy.CreateHTTPContextFunc",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.WithEndpointPath",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Println",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).createMCPHandler",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).handleSignals",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "context.Background",
+      "callee_pkg": "context",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "context.WithTimeout",
+      "callee_pkg": "context",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*net/http.Server).Shutdown",
+      "callee_pkg": "net/http",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeHTTP",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*net/http.Server).Close",
+      "callee_pkg": "net/http",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 71
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).ServeStdio",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.ServeStdio",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 66
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).getScheme",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.getEnv",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 232
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).handleSignals",
+      "caller_pkg": "internal/mcp",
+      "callee": "os/signal.Notify",
+      "callee_pkg": "os/signal",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 225
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).handleStatus",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Fprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 218
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).handleStatus",
+      "caller_pkg": "internal/mcp",
+      "callee": "(net/http.Header).Set",
+      "callee_pkg": "net/http",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 218
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 27
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 198
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 152
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListCatalogs",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 63
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListSchemas",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 83
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListTables",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.MarshalIndent",
+      "callee_pkg": "encoding/json",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 116
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.NewServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 30
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.WithDescription",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/mark3labs/mcp-go/server.MCPServer).AddTool",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.NewTool",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.WithString",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.Description",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.Required",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp",
+      "caller_file": "internal/mcp/handlers.go",
+      "caller_line": 241
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/oauth-mcp-proxy.NewServer",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "(*github.com/Vungle/oauth-mcp-proxy.Server).Middleware",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.WithToolHandlerMiddleware",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.RegisterTrinoTools",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.NewMCPServer",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.trinoConfigToOAuthConfig",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.createMCPServer",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.WithToolCapabilities",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 41
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.getEnv",
+      "caller_pkg": "internal/mcp",
+      "callee": "os.LookupEnv",
+      "callee_pkg": "os",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 283
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "time.init",
+      "callee_pkg": "time"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "os.init",
+      "callee_pkg": "os"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/oauth-mcp-proxy.init",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "context.init",
+      "callee_pkg": "context"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "callee_pkg": "internal/trino"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/mcp.init",
+      "callee_pkg": "github.com/mark3labs/mcp-go/mcp"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "encoding/json.init",
+      "callee_pkg": "encoding/json"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.init",
+      "callee_pkg": "fmt"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "net/http.init",
+      "callee_pkg": "net/http"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "os/signal.init",
+      "callee_pkg": "os/signal"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "strings.init",
+      "callee_pkg": "strings"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.init",
+      "callee_pkg": "internal/config"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "log.init",
+      "callee_pkg": "log"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "syscall.init",
+      "callee_pkg": "syscall"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.init",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/mark3labs/mcp-go/server.init",
+      "callee_pkg": "github.com/mark3labs/mcp-go/server"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.trinoConfigToOAuthConfig",
+      "caller_pkg": "internal/mcp",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 257
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/mcp.trinoConfigToOAuthConfig",
+      "caller_pkg": "internal/mcp",
+      "callee": "github.com/Vungle/mcp-trino/internal/mcp.getEnv",
+      "callee_pkg": "internal/mcp",
+      "caller_file": "internal/mcp/server.go",
+      "caller_line": 257
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).Close",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).Close",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 73
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery$1",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.Rows).Next",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.getQueryUsername",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.TrimSpace",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.Rows).Scan",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.TrimSuffix",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.Rows).Columns",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).QueryContext",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.Rows).Err",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "database/sql.Named",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 240
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 434
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 434
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 434
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.TrimSpace",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 434
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExplainQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.ToUpper",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 434
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 396
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 396
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.Split",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 396
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isTableAllowed",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 396
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).GetTableSchema",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 396
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListCatalogs",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 317
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListCatalogs",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterCatalogs",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 317
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListSchemas",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 339
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListSchemas",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterSchemas",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 339
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListSchemas",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 339
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListTables",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 366
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListTables",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterTables",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 366
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ListTables",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 366
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterCatalogs",
+      "caller_pkg": "internal/trino",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 472
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterCatalogs",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isCatalogAllowed",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 472
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterSchemas",
+      "caller_pkg": "internal/trino",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 489
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterSchemas",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isSchemaAllowed",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 489
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterTables",
+      "caller_pkg": "internal/trino",
+      "callee": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isTableAllowed",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 506
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).filterTables",
+      "caller_pkg": "internal/trino",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 506
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isCatalogAllowed",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.EqualFold",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 523
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isSchemaAllowed",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.EqualFold",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 533
+    },
+    {
+      "caller": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isTableAllowed",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.EqualFold",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 544
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "database/sql.Open",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).Close",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "net/url.QueryEscape",
+      "callee_pkg": "net/url",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "log.Printf",
+      "callee_pkg": "log",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.sanitizeConnectionError",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).SetMaxOpenConns",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).SetMaxIdleConns",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).SetConnMaxLifetime",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.NewClient",
+      "caller_pkg": "internal/trino",
+      "callee": "(*database/sql.DB).Ping",
+      "callee_pkg": "database/sql",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 26
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.getQueryUsername",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/oauth-mcp-proxy.GetUserFromContext",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 222
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.init",
+      "callee_pkg": "regexp"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "net/url.init",
+      "callee_pkg": "net/url"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "time.init",
+      "callee_pkg": "time"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/config.init",
+      "callee_pkg": "internal/config"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/oauth-mcp-proxy.init",
+      "callee_pkg": "github.com/Vungle/oauth-mcp-proxy"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/trinodb/trino-go-client/trino.init",
+      "callee_pkg": "github.com/trinodb/trino-go-client/trino"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.init",
+      "callee_pkg": "strings"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "context.init",
+      "callee_pkg": "context"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "log.init",
+      "callee_pkg": "log"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "database/sql.init",
+      "callee_pkg": "database/sql"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.init",
+      "callee_pkg": "fmt"
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isAllowedReadOnlyPattern",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.QuoteMeta",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 141
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isAllowedReadOnlyPattern",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 141
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isAllowedReadOnlyPattern",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.MatchString",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 141
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.MatchString",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.sanitizeQueryForKeywordDetection",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.QuoteMeta",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "github.com/Vungle/mcp-trino/internal/trino.isAllowedReadOnlyPattern",
+      "callee_pkg": "internal/trino",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.TrimSpace",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.ToLower",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.Contains",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Sprintf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.isReadOnlyQuery",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.ReplaceAll",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 79
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeConnectionError",
+      "caller_pkg": "internal/trino",
+      "callee": "fmt.Errorf",
+      "callee_pkg": "fmt",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 451
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeConnectionError",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.ReplaceAll",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 451
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeConnectionError",
+      "caller_pkg": "internal/trino",
+      "callee": "net/url.QueryEscape",
+      "callee_pkg": "net/url",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 451
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeQueryForKeywordDetection",
+      "caller_pkg": "internal/trino",
+      "callee": "(*regexp.Regexp).ReplaceAllString",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 200
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeQueryForKeywordDetection",
+      "caller_pkg": "internal/trino",
+      "callee": "regexp.MustCompile",
+      "callee_pkg": "regexp",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 200
+    },
+    {
+      "caller": "github.com/Vungle/mcp-trino/internal/trino.sanitizeQueryForKeywordDetection",
+      "caller_pkg": "internal/trino",
+      "callee": "strings.TrimSpace",
+      "callee_pkg": "strings",
+      "caller_file": "internal/trino/client.go",
+      "caller_line": 200
+    }
+  ],
+  "entry_points": [
+    {
+      "name": "github.com/Vungle/mcp-trino/cmd.main",
+      "package": "cmd",
+      "file": "cmd/main.go",
+      "line": 22,
+      "callers": 0,
+      "callees": 13
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/examples.init",
+      "package": "examples",
+      "callers": 0,
+      "callees": 7
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/examples.main",
+      "package": "examples",
+      "file": "examples/test_query.go",
+      "line": 18,
+      "callers": 0,
+      "callees": 7
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/cmd.init",
+      "package": "cmd",
+      "callers": 0,
+      "callees": 7
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).GetTableSchema",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 152,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListSchemas",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 83,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListCatalogs",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 63,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExplainQuery",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 198,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ListTables",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 116,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.TrinoHandlers).ExecuteQuery",
+      "package": "internal/mcp",
+      "file": "internal/mcp/handlers.go",
+      "line": 27,
+      "callers": 0,
+      "callees": 6
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).handleStatus",
+      "package": "internal/mcp",
+      "file": "internal/mcp/server.go",
+      "line": 218,
+      "callers": 0,
+      "callees": 2
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/mcp.Server).getScheme",
+      "package": "internal/mcp",
+      "file": "internal/mcp/server.go",
+      "line": 232,
+      "callers": 0,
+      "callees": 1
+    }
+  ],
+  "most_called": [
+    {
+      "name": "log.Printf",
+      "package": "log",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/log/log.go",
+      "line": 407,
+      "callers": 17,
+      "callees": 0
+    },
+    {
+      "name": "fmt.Errorf",
+      "package": "fmt",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/fmt/errors.go",
+      "line": 23,
+      "callers": 15,
+      "callees": 0
+    },
+    {
+      "name": "fmt.Sprintf",
+      "package": "fmt",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/fmt/print.go",
+      "line": 237,
+      "callers": 11,
+      "callees": 0
+    },
+    {
+      "name": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+      "package": "github.com/mark3labs/mcp-go/mcp",
+      "file": "../../../../go/pkg/mod/github.com/mark3labs/mcp-go@v0.42.0/mcp/utils.go",
+      "line": 408,
+      "callers": 6,
+      "callees": 0
+    },
+    {
+      "name": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+      "package": "github.com/mark3labs/mcp-go/mcp",
+      "file": "../../../../go/pkg/mod/github.com/mark3labs/mcp-go@v0.42.0/mcp/utils.go",
+      "line": 271,
+      "callers": 6,
+      "callees": 0
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+      "package": "internal/trino",
+      "file": "internal/trino/client.go",
+      "line": 240,
+      "callers": 6,
+      "callees": 13
+    },
+    {
+      "name": "encoding/json.MarshalIndent",
+      "package": "encoding/json",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/encoding/json/encode.go",
+      "line": 221,
+      "callers": 6,
+      "callees": 0
+    },
+    {
+      "name": "strings.TrimSpace",
+      "package": "strings",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/strings/strings.go",
+      "line": 1091,
+      "callers": 5,
+      "callees": 0
+    },
+    {
+      "name": "log.init",
+      "package": "log",
+      "callers": 5,
+      "callees": 0
+    },
+    {
+      "name": "strings.init",
+      "package": "strings",
+      "callers": 5,
+      "callees": 0
+    },
+    {
+      "name": "strings.EqualFold",
+      "package": "strings",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/strings/strings.go",
+      "line": 1187,
+      "callers": 4,
+      "callees": 0
+    },
+    {
+      "name": "fmt.init",
+      "package": "fmt",
+      "callers": 4,
+      "callees": 0
+    },
+    {
+      "name": "log.Println",
+      "package": "log",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/log/log.go",
+      "line": 415,
+      "callers": 4,
+      "callees": 0
+    },
+    {
+      "name": "context.init",
+      "package": "context",
+      "callers": 3,
+      "callees": 0
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/examples.executeQuery",
+      "package": "examples",
+      "file": "examples/test_query.go",
+      "line": 51,
+      "callers": 3,
+      "callees": 9
+    },
+    {
+      "name": "strings.ReplaceAll",
+      "package": "strings",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/strings/strings.go",
+      "line": 1180,
+      "callers": 3,
+      "callees": 0
+    },
+    {
+      "name": "os.LookupEnv",
+      "package": "os",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/os/env.go",
+      "line": 112,
+      "callers": 3,
+      "callees": 0
+    },
+    {
+      "name": "time.init",
+      "package": "time",
+      "callers": 3,
+      "callees": 0
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/internal/config.init",
+      "package": "internal/config",
+      "callers": 3,
+      "callees": 6
+    },
+    {
+      "name": "os.init",
+      "package": "os",
+      "callers": 3,
+      "callees": 0
+    },
+    {
+      "name": "strings.Split",
+      "package": "strings",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/strings/strings.go",
+      "line": 361,
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "regexp.QuoteMeta",
+      "package": "regexp",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/regexp/regexp.go",
+      "line": 702,
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "encoding/json.Unmarshal",
+      "package": "encoding/json",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/encoding/json/decode.go",
+      "line": 102,
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "encoding/json.init",
+      "package": "encoding/json",
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "regexp.MatchString",
+      "package": "regexp",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/regexp/regexp.go",
+      "line": 530,
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "(*github.com/Vungle/mcp-trino/internal/trino.Client).isTableAllowed",
+      "package": "internal/trino",
+      "file": "internal/trino/client.go",
+      "line": 544,
+      "callers": 2,
+      "callees": 1
+    },
+    {
+      "name": "github.com/Vungle/oauth-mcp-proxy.init",
+      "package": "github.com/Vungle/oauth-mcp-proxy",
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "log.Fatalf",
+      "package": "log",
+      "file": "../../../../../../opt/homebrew/Cellar/go/1.26.0/libexec/src/log/log.go",
+      "line": 430,
+      "callers": 2,
+      "callees": 0
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/internal/mcp.getEnv",
+      "package": "internal/mcp",
+      "file": "internal/mcp/server.go",
+      "line": 283,
+      "callers": 2,
+      "callees": 1
+    },
+    {
+      "name": "github.com/Vungle/mcp-trino/internal/trino.init",
+      "package": "internal/trino",
+      "callers": 2,
+      "callees": 11
+    }
+  ],
+  "dead_code": null,
+  "package_stats": {
+    "cmd": {
+      "functions": 0,
+      "internal_edges": 2,
+      "incoming_edges": 0,
+      "outgoing_edges": 10
+    },
+    "examples": {
+      "functions": 0,
+      "internal_edges": 8,
+      "incoming_edges": 0,
+      "outgoing_edges": 0
+    },
+    "internal/config": {
+      "functions": 0,
+      "internal_edges": 4,
+      "incoming_edges": 4,
+      "outgoing_edges": 0
+    },
+    "internal/mcp": {
+      "functions": 0,
+      "internal_edges": 8,
+      "incoming_edges": 4,
+      "outgoing_edges": 8
+    },
+    "internal/trino": {
+      "functions": 0,
+      "internal_edges": 18,
+      "incoming_edges": 11,
+      "outgoing_edges": 1
+    }
+  }
+}

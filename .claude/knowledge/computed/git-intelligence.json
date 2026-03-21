@@ -1,0 +1,104 @@
+{
+  "generated": "2026-03-20T03:16:45Z",
+  "period_days": 180,
+  "file_churn": [
+    {
+      "file": "internal/trino/client.go",
+      "commits": 1,
+      "lines_added": 552,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/trino/client_test.go",
+      "commits": 1,
+      "lines_added": 497,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "commits": 1,
+      "lines_added": 288,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/mcp/handlers.go",
+      "commits": 1,
+      "lines_added": 274,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/config/oauth_test.go",
+      "commits": 1,
+      "lines_added": 181,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/config/config.go",
+      "commits": 1,
+      "lines_added": 218,
+      "lines_deleted": 0
+    },
+    {
+      "file": "internal/config/config_test.go",
+      "commits": 1,
+      "lines_added": 260,
+      "lines_deleted": 0
+    },
+    {
+      "file": "examples/test_query.go",
+      "commits": 1,
+      "lines_added": 145,
+      "lines_deleted": 0
+    },
+    {
+      "file": "cmd/main.go",
+      "commits": 1,
+      "lines_added": 82,
+      "lines_deleted": 0
+    }
+  ],
+  "bug_hotspots": [],
+  "co_change_coupling": [],
+  "directory_ownership": [
+    {
+      "directory": "cmd/main.go",
+      "top_authors": [
+        {
+          "author": "Zhong Liang Ong",
+          "commits": 1
+        }
+      ]
+    },
+    {
+      "directory": "internal/config",
+      "top_authors": [
+        {
+          "author": "internal/config/config_test.go",
+          "commits": 1
+        },
+        {
+          "author": "examples/test_query.go",
+          "commits": 1
+        }
+      ]
+    },
+    {
+      "directory": "internal/mcp",
+      "top_authors": [
+        {
+          "author": "internal/mcp/handlers.go",
+          "commits": 1
+        }
+      ]
+    },
+    {
+      "directory": "internal/trino",
+      "top_authors": [
+        {
+          "author": "internal/trino/client.go",
+          "commits": 1
+        }
+      ]
+    }
+  ]
+}

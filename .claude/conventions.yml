@@ -1,0 +1,73 @@
+# mcp-trino conventions
+
+mcp_tools:
+  description: "6 MCP tools exposing Trino analytics to AI assistants"
+  rules:
+    - "All 6 tools: execute_query, list_catalogs, list_schemas, list_tables, get_table_schema, explain_query"
+    - "All tools return JSON-formatted responses via mcp.NewToolResultText()"
+    - "Parameter validation at handler level in internal/mcp/handlers.go"
+    - "Tool registration in RegisterTrinoTools() with security middleware applied server-wide via WithToolHandlerMiddleware()"
+    - "New tools must follow existing pattern: extract args from map[string]interface{}, call client method, marshal to JSON"
+    - "Error responses use mcp.NewToolResultErrorFromErr() — never return Go errors directly"
+
+sql_security:
+  description: "Read-only query enforcement via isReadOnlyQuery whitelist"
+  rules:
+    - "isReadOnlyQuery() in internal/trino/client.go is the security gate — allows SELECT, SHOW, DESCRIBE, EXPLAIN, WITH"
+    - "Write operations blocked by default: INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, TRUNCATE, MERGE, GRANT, REVOKE, etc."
+    - "SHOW CREATE TABLE/VIEW/SCHEMA are explicitly allowed as read-only patterns via isAllowedReadOnlyPattern()"
+    - "sanitizeQueryForKeywordDetection() strips string literals, quoted identifiers, and comments before keyword scanning"
+    - "Semicolons blocked to prevent multi-statement injection"
+    - "TRINO_ALLOW_WRITE_QUERIES=true overrides read-only enforcement (logs warning)"
+    - "Trailing semicolons stripped before execution (Trino does not accept them)"
+
+oauth_integration:
+  description: "OAuth 2.1 via Vungle/oauth-mcp-proxy library"
+  rules:
+    - "OAuth integration in internal/mcp/server.go via github.com/Vungle/oauth-mcp-proxy"
+    - "Two modes: native (client-driven OIDC) and proxy (server-driven with token exchange)"
+    - "Four providers: hmac (JWT signing), okta, google, azure"
+    - "OAUTH_ENABLED is single source of truth — all OAuth config ignored when false"
+    - "OAuth middleware applied server-wide via mcpserver.WithToolHandlerMiddleware(oauthServer.Middleware())"
+    - "Token caching and validation delegated to oauth-mcp-proxy library"
+    - "User identity extracted from context via oauth.GetUserFromContext() for Trino query tagging"
+
+allowlists:
+  description: "Catalog/schema/table allowlists for data governance"
+  rules:
+    - "TRINO_ALLOWED_CATALOGS: comma-separated catalog names (empty = no filtering)"
+    - "TRINO_ALLOWED_SCHEMAS: comma-separated catalog.schema entries (validated for 1 dot)"
+    - "TRINO_ALLOWED_TABLES: comma-separated catalog.schema.table entries (validated for 2 dots)"
+    - "All filtering is case-insensitive via strings.EqualFold()"
+    - "Allowlists validated at config load time — malformed entries fail startup"
+    - "Filtering applied post-query in filterCatalogs(), filterSchemas(), filterTables()"
+    - "GetTableSchema resolves table parameter (dotted notation) before allowlist check"
+
+transport:
+  description: "STDIO + HTTP StreamableHTTP dual transport"
+  rules:
+    - "MCP_TRANSPORT=stdio (default) for desktop MCP clients"
+    - "MCP_TRANSPORT=http for remote/server deployment"
+    - "HTTP uses StreamableHTTP on /mcp endpoint with /sse for backward compatibility"
+    - "/status endpoint returns JSON health check with version"
+    - "CORS headers set on all MCP endpoints (Access-Control-Allow-Origin: *)"
+    - "HTTPS supported via HTTPS_CERT_FILE and HTTPS_KEY_FILE env vars"
+
+configuration:
+  description: "Environment variable configuration with secure defaults"
+  rules:
+    - "All config via env vars — no config files"
+    - "Secure defaults: TRINO_SSL=true, TRINO_SCHEME=https, TRINO_ALLOW_WRITE_QUERIES=false, OAUTH_ENABLED=false"
+    - "HTTPS scheme forces SSL=true regardless of TRINO_SSL setting"
+    - "TRINO_QUERY_TIMEOUT defaults to 30s, validated > 0, invalid values fall back to default with warning"
+    - "Connection pool: 10 max open, 5 max idle, 5min max lifetime"
+    - "Password sanitized from connection error messages via sanitizeConnectionError()"
+
+testing:
+  description: "Table-driven tests with race detection"
+  rules:
+    - "Table-driven test pattern for all test cases"
+    - "Tests cover: SQL security (isReadOnlyQuery), allowlist filtering, config parsing, OAuth modes"
+    - "Run tests: make test (go test ./...)"
+    - "Run linting: make lint (golangci-lint + go mod tidy check)"
+    - "Environment save/restore pattern in config tests to avoid test pollution"

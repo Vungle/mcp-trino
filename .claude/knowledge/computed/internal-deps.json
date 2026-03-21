@@ -1,0 +1,66 @@
+{
+  "generated": "2026-03-20T03:16:44Z",
+  "module": "github.com/Vungle/mcp-trino",
+  "total_packages": 5,
+  "packages": {
+    "cmd": {
+      "path": "cmd",
+      "rel_dir": "cmd",
+      "imports": [
+        "internal/config",
+        "internal/mcp",
+        "internal/trino"
+      ],
+      "imported_by": null,
+      "file_count": 1
+    },
+    "examples": {
+      "path": "examples",
+      "rel_dir": "examples",
+      "imports": null,
+      "imported_by": null,
+      "file_count": 1
+    },
+    "internal/config": {
+      "path": "internal/config",
+      "rel_dir": "internal/config",
+      "imports": null,
+      "imported_by": [
+        "cmd",
+        "internal/mcp",
+        "internal/trino"
+      ],
+      "file_count": 1
+    },
+    "internal/mcp": {
+      "path": "internal/mcp",
+      "rel_dir": "internal/mcp",
+      "imports": [
+        "internal/config",
+        "internal/trino"
+      ],
+      "imported_by": [
+        "cmd"
+      ],
+      "file_count": 2
+    },
+    "internal/trino": {
+      "path": "internal/trino",
+      "rel_dir": "internal/trino",
+      "imports": [
+        "internal/config"
+      ],
+      "imported_by": [
+        "cmd",
+        "internal/mcp"
+      ],
+      "file_count": 1
+    }
+  },
+  "external_deps": [
+    "github.com/Vungle/oauth-mcp-proxy",
+    "github.com/mark3labs/mcp-go/mcp",
+    "github.com/mark3labs/mcp-go/server",
+    "github.com/trinodb/trino-go-client/trino"
+  ]
+}
