@@ -1,104 +1,24 @@
 {
-  "generated": "2026-03-20T03:16:45Z",
+  "generated": "2026-03-23T00:00:00Z",
   "period_days": 180,
-  "file_churn": [
-    {
-      "file": "internal/trino/client.go",
-      "commits": 1,
-      "lines_added": 552,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/trino/client_test.go",
-      "commits": 1,
-      "lines_added": 497,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/mcp/server.go",
-      "commits": 1,
-      "lines_added": 288,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/mcp/handlers.go",
-      "commits": 1,
-      "lines_added": 274,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/config/oauth_test.go",
-      "commits": 1,
-      "lines_added": 181,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/config/config.go",
-      "commits": 1,
-      "lines_added": 218,
-      "lines_deleted": 0
-    },
-    {
-      "file": "internal/config/config_test.go",
-      "commits": 1,
-      "lines_added": 260,
-      "lines_deleted": 0
-    },
-    {
-      "file": "examples/test_query.go",
-      "commits": 1,
-      "lines_added": 145,
-      "lines_deleted": 0
-    },
-    {
-      "file": "cmd/main.go",
-      "commits": 1,
-      "lines_added": 82,
-      "lines_deleted": 0
+  "since": "2025-09-24",
+  "recent_activity": {
+    "total_commits": 28,
+    "unique_authors": 7,
+    "fix_bug_commits": 9,
+    "first_commit_date": "2025-09-26",
+    "last_commit_date": "2026-03-20",
+    "commits_per_month": {
+      "2025-09": 11,      "2025-10": 12,      "2025-11": 1,      "2025-12": 3,      "2026-03": 1
     }
+  },
+  "top_authors": [
+    {"author": "Tommy Nguyen", "commits": 16},    {"author": "dependabot[bot]", "commits": 4},    {"author": "Zhong Liang Ong", "commits": 3},    {"author": "tommynguyen-vungle", "commits": 2},    {"author": "Mian Leow", "commits": 1},    {"author": "Kate Alpert", "commits": 1},    {"author": "Changhoon Oh", "commits": 1}
   ],
-  "bug_hotspots": [],
-  "co_change_coupling": [],
-  "directory_ownership": [
-    {
-      "directory": "cmd/main.go",
-      "top_authors": [
-        {
-          "author": "Zhong Liang Ong",
-          "commits": 1
-        }
-      ]
-    },
-    {
-      "directory": "internal/config",
-      "top_authors": [
-        {
-          "author": "internal/config/config_test.go",
-          "commits": 1
-        },
-        {
-          "author": "examples/test_query.go",
-          "commits": 1
-        }
-      ]
-    },
-    {
-      "directory": "internal/mcp",
-      "top_authors": [
-        {
-          "author": "internal/mcp/handlers.go",
-          "commits": 1
-        }
-      ]
-    },
-    {
-      "directory": "internal/trino",
-      "top_authors": [
-        {
-          "author": "internal/trino/client.go",
-          "commits": 1
-        }
-      ]
-    }
+  "file_churn": [
+    {"file": "go.mod", "commits": 9},    {"file": "go.sum", "commits": 8},    {"file": "internal/oauth/metadata.go", "commits": 7},    {"file": "internal/oauth/handlers.go", "commits": 5},    {"file": "internal/trino/client.go", "commits": 4},    {"file": ".github/workflows/build.yml", "commits": 4},    {"file": "internal/trino/client_test.go", "commits": 3},    {"file": "internal/mcp/server.go", "commits": 3},    {"file": "internal/mcp/handlers.go", "commits": 3},    {"file": "docs/oauth.md", "commits": 3},    {"file": "charts/mcp-trino/templates/configmap.yaml", "commits": 3},    {"file": ".github/workflows/release.yml", "commits": 3},    {"file": "README.md", "commits": 2},    {"file": "internal/oauth/state_test.go", "commits": 2},    {"file": "internal/oauth/security_test.go", "commits": 2},    {"file": "internal/oauth/security_scenarios_test.go", "commits": 2},    {"file": "internal/oauth/metadata_test.go", "commits": 2},    {"file": "internal/oauth/fixed_redirect_test.go", "commits": 2},    {"file": "internal/oauth/attack_scenarios_test.go", "commits": 2},    {"file": "internal/config/oauth_test.go", "commits": 2},    {"file": "internal/config/config.go", "commits": 2},    {"file": "cmd/main.go", "commits": 2},    {"file": "charts/INSTALLATION.md", "commits": 2},    {"file": "trino-conf/config.properties", "commits": 1},    {"file": "internal/oauth/providers.go", "commits": 1},    {"file": "internal/oauth/providers_test.go", "commits": 1},    {"file": "internal/oauth/middleware.go", "commits": 1},    {"file": "internal/oauth/config.go", "commits": 1},    {"file": "internal/config/config_test.go", "commits": 1},    {"file": "docs/jwt.md", "commits": 1},    {"file": "docs/integrations.md", "commits": 1},    {"file": "docs/deployment.md", "commits": 1},    {"file": "Dockerfile", "commits": 1},    {"file": "docker-compose.yml", "commits": 1},    {"file": "CLAUDE.md", "commits": 1}
+  ],
+  "bug_hotspots": [
+    {"file": "internal/oauth/metadata.go", "fix_commits": 4},    {"file": "internal/oauth/handlers.go", "fix_commits": 3},    {"file": "internal/trino/client.go", "fix_commits": 2},    {"file": "internal/trino/client_test.go", "fix_commits": 2},    {"file": "docs/oauth.md", "fix_commits": 2},    {"file": "trino-conf/config.properties", "fix_commits": 1},    {"file": "internal/oauth/security_test.go", "fix_commits": 1},    {"file": "internal/oauth/metadata_test.go", "fix_commits": 1},    {"file": "internal/mcp/server.go", "fix_commits": 1},    {"file": "internal/mcp/handlers.go", "fix_commits": 1},    {"file": "internal/config/oauth_test.go", "fix_commits": 1},    {"file": "internal/config/config.go", "fix_commits": 1},    {"file": "internal/config/config_test.go", "fix_commits": 1},    {"file": "go.sum", "fix_commits": 1},    {"file": "go.mod", "fix_commits": 1},    {"file": "Dockerfile", "fix_commits": 1},    {"file": "docker-compose.yml", "fix_commits": 1},    {"file": "cmd/main.go", "fix_commits": 1},    {"file": "charts/mcp-trino/values.yaml", "fix_commits": 1},    {"file": "charts/mcp-trino/templates/secret.yaml", "fix_commits": 1}
   ]
 }
