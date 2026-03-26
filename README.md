@@ -83,10 +83,14 @@ graph TB
 - **AI Clients**: Various MCP-compatible applications
 - **Authentication**: Optional OAuth 2.0 with OIDC providers
 - **MCP Server**: Go-based server with dual transport support
+- **CLI Mode**: Interactive SQL shell for direct Trino access (psql-like)
 - **Data Layer**: Trino cluster connecting to multiple data sources
 
 ## Features
 
+- ✅ **Dual Mode**: Works as both MCP server AND interactive CLI
+  - **CLI Mode**: psql-like interactive SQL shell for direct Trino access
+  - **MCP Mode**: Full MCP server for AI assistant integration
 - ✅ MCP server implementation in Go
 - ✅ Trino SQL query execution through MCP tools
 - ✅ Catalog, schema, and table discovery
@@ -125,6 +129,117 @@ mcp-trino
 ```
 
 For production deployment with OAuth, see [Deployment Guide](docs/deployment.md) and [OAuth Architecture](docs/oauth.md).
+
+## CLI Mode
+
+mcp-trino can be used as an interactive CLI similar to `psql` or the Trino CLI:
+
+```bash
+# Interactive REPL mode
+mcp-trino --interactive
+
+# Execute a query directly
+mcp-trino query "SELECT * FROM my_table LIMIT 10"
+
+# List catalogs, schemas, tables
+mcp-trino catalogs
+mcp-trino schemas my_catalog
+mcp-trino tables my_catalog my_schema
+
+# Describe a table
+mcp-trino describe my_catalog.my_schema.my_table
+
+# Explain a query
+mcp-trino explain "SELECT COUNT(*) FROM my_table"
+
+# Output formats
+mcp-trino --format json query "SELECT 1"
+mcp-trino --format csv query "SELECT 1"
+mcp-trino --format table query "SELECT 1"  # default
+```
+
+### Named Profiles
+
+mcp-trino supports named connection profiles for easy switching between Trino environments:
+
+**Configuration File** (~/.config/trino/config.yaml):
+
+```yaml
+current: prod
+
+profiles:
+  prod:
+    host: trino.example.com
+    port: 443
+    user: prod_user
+    password: prod_password
+    catalog: hive
+    schema: analytics
+    ssl:
+      enabled: true
+      insecure: false
+
+  dev:
+    host: localhost
+    port: 8080
+    user: trino
+    catalog: memory
+    schema: default
+
+  staging:
+    host: staging-trino.example.com
+    port: 443
+    user: staging_user
+
+output:
+  format: table
+```
+
+**Profile Management Commands:**
+
+```bash
+# List all profiles
+mcp-trino config profile list
+
+# Set default profile
+mcp-trino config profile use prod
+
+# Show profile details
+mcp-trino config profile show staging
+
+# Use a specific profile (overrides config file)
+mcp-trino --profile dev catalogs
+```
+
+**Configuration Precedence** (highest to lowest):
+1. CLI flags (`--host`, `--port`, etc.)
+2. `--profile` flag
+3. `TRINO_PROFILE` environment variable
+4. `current` field in config file
+5. `default` profile fallback
+6. Environment variables (`TRINO_HOST`, etc.)
+
+**Environment Variables** (lowest priority - overridden by profiles and flags):
+
+```bash
+export TRINO_HOST=trino.example.com
+export TRINO_PORT=443
+export TRINO_USER=myuser
+export TRINO_PASSWORD=mypass
+export TRINO_CATALOG=hive
+export TRINO_SCHEMA=analytics
+export TRINO_SSL=true
+```
+
+**REPL Meta-Commands** (in interactive mode):
+- `\help` - Show help
+- `\quit`, `\exit`, `\q` - Exit REPL
+- `\history` - Show command history
+- `\catalogs` - List all catalogs
+- `\schemas [catalog]` - List schemas
+- `\tables [catalog schema]` - List tables
+- `\describe <table>` - Describe table
+- `\format <table|json|csv>` - Change output format
 
 ## Usage
 
