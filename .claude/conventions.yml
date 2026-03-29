@@ -64,10 +64,7 @@ configuration:
     - "Password sanitized from connection error messages via sanitizeConnectionError()"
 
 testing:
-  description: "Table-driven tests with race detection"
+  description: "mcp-trino specific test patterns"
   rules:
-    - "Table-driven test pattern for all test cases"
     - "Tests cover: SQL security (isReadOnlyQuery), allowlist filtering, config parsing, OAuth modes"
-    - "Run tests: make test (go test ./...)"
-    - "Run linting: make lint (golangci-lint + go mod tidy check)"
     - "Environment save/restore pattern in config tests to avoid test pollution"

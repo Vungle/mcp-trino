@@ -1,10 +1,7 @@
 # mcp-trino review rules
 
 global:
-  - "Run make test before merging"
-  - "Run make lint (golangci-lint + go mod tidy verification)"
   - "Security scan: govulncheck + Trivy in CI"
-  - "Check that go.mod and go.sum are tidy"
 
 internal/trino/:
   - "SQL security changes (isReadOnlyQuery, isAllowedReadOnlyPattern, sanitizeQueryForKeywordDetection) require security audit"
