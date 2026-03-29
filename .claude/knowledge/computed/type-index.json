@@ -1,0 +1,266 @@
+{
+  "generated": "2026-03-20T03:16:43Z",
+  "module": "github.com/Vungle/mcp-trino",
+  "total_types": 4,
+  "total_functions": 5,
+  "packages": [
+    {
+      "path": "github.com/Vungle/mcp-trino/internal/config",
+      "rel_dir": "internal/config",
+      "structs": [
+        {
+          "name": "TrinoConfig",
+          "file": "internal/config/config.go",
+          "line": 13,
+          "fields": [
+            {
+              "name": "Host",
+              "type": "string"
+            },
+            {
+              "name": "Port",
+              "type": "int"
+            },
+            {
+              "name": "User",
+              "type": "string"
+            },
+            {
+              "name": "Password",
+              "type": "string"
+            },
+            {
+              "name": "Catalog",
+              "type": "string"
+            },
+            {
+              "name": "Schema",
+              "type": "string"
+            },
+            {
+              "name": "Scheme",
+              "type": "string"
+            },
+            {
+              "name": "SSL",
+              "type": "bool"
+            },
+            {
+              "name": "SSLInsecure",
+              "type": "bool"
+            },
+            {
+              "name": "AllowWriteQueries",
+              "type": "bool"
+            },
+            {
+              "name": "QueryTimeout",
+              "type": "time.Duration"
+            },
+            {
+              "name": "OAuthEnabled",
+              "type": "bool"
+            },
+            {
+              "name": "OAuthMode",
+              "type": "string"
+            },
+            {
+              "name": "OAuthProvider",
+              "type": "string"
+            },
+            {
+              "name": "JWTSecret",
+              "type": "string"
+            },
+            {
+              "name": "OIDCIssuer",
+              "type": "string"
+            },
+            {
+              "name": "OIDCAudience",
+              "type": "string"
+            },
+            {
+              "name": "OIDCClientID",
+              "type": "string"
+            },
+            {
+              "name": "OIDCClientSecret",
+              "type": "string"
+            },
+            {
+              "name": "OAuthRedirectURIs",
+              "type": "string"
+            },
+            {
+              "name": "AllowedCatalogs",
+              "type": "[]string"
+            },
+            {
+              "name": "AllowedSchemas",
+              "type": "[]string"
+            },
+            {
+              "name": "AllowedTables",
+              "type": "[]string"
+            }
+          ],
+          "methods": null
+        }
+      ],
+      "functions": [
+        {
+          "name": "NewTrinoConfig",
+          "signature": "func() (*internal/config.TrinoConfig, error)",
+          "file": "internal/config/config.go",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "path": "github.com/Vungle/mcp-trino/internal/mcp",
+      "rel_dir": "internal/mcp",
+      "structs": [
+        {
+          "name": "Server",
+          "file": "internal/mcp/server.go",
+          "line": 22,
+          "fields": null,
+          "methods": [
+            {
+              "name": "ServeStdio",
+              "signature": "func() error",
+              "receiver": "*T"
+            },
+            {
+              "name": "ServeHTTP",
+              "signature": "func(port string) error",
+              "receiver": "*T"
+            }
+          ]
+        },
+        {
+          "name": "TrinoHandlers",
+          "file": "internal/mcp/handlers.go",
+          "line": 15,
+          "fields": [
+            {
+              "name": "TrinoClient",
+              "type": "*internal/trino.Client"
+            }
+          ],
+          "methods": [
+            {
+              "name": "ExecuteQuery",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListCatalogs",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListSchemas",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListTables",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "GetTableSchema",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ExplainQuery",
+              "signature": "func(ctx context.Context, request github.com/mark3labs/mcp-go/mcp.CallToolRequest) (*github.com/mark3labs/mcp-go/mcp.CallToolResult, error)",
+              "receiver": "*T"
+            }
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "NewServer",
+          "signature": "func(trinoClient *internal/trino.Client, trinoConfig *internal/config.TrinoConfig, version string) *internal/mcp.Server",
+          "file": "internal/mcp/server.go",
+          "line": 30
+        },
+        {
+          "name": "NewTrinoHandlers",
+          "signature": "func(client *internal/trino.Client) *internal/mcp.TrinoHandlers",
+          "file": "internal/mcp/handlers.go",
+          "line": 20
+        },
+        {
+          "name": "RegisterTrinoTools",
+          "signature": "func(m *github.com/mark3labs/mcp-go/server.MCPServer, h *internal/mcp.TrinoHandlers)",
+          "file": "internal/mcp/handlers.go",
+          "line": 241
+        }
+      ]
+    },
+    {
+      "path": "github.com/Vungle/mcp-trino/internal/trino",
+      "rel_dir": "internal/trino",
+      "structs": [
+        {
+          "name": "Client",
+          "file": "internal/trino/client.go",
+          "line": 19,
+          "fields": null,
+          "methods": [
+            {
+              "name": "Close",
+              "signature": "func() error",
+              "receiver": "*T"
+            },
+            {
+              "name": "ExecuteQuery",
+              "signature": "func(ctx context.Context, query string) ([]map[string]interface{}, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListCatalogs",
+              "signature": "func(ctx context.Context) ([]string, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListSchemas",
+              "signature": "func(ctx context.Context, catalog string) ([]string, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ListTables",
+              "signature": "func(ctx context.Context, catalog string, schema string) ([]string, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "GetTableSchema",
+              "signature": "func(ctx context.Context, catalog string, schema string, table string) ([]map[string]interface{}, error)",
+              "receiver": "*T"
+            },
+            {
+              "name": "ExplainQuery",
+              "signature": "func(ctx context.Context, query string, format string) ([]map[string]interface{}, error)",
+              "receiver": "*T"
+            }
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "NewClient",
+          "signature": "func(cfg *internal/config.TrinoConfig) (*internal/trino.Client, error)",
+          "file": "internal/trino/client.go",
+          "line": 26
+        }
+      ]
+    }
+  ]
+}

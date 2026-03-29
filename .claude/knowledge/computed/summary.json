@@ -1,0 +1,252 @@
+{
+  "generated": "2026-03-20T03:18:52Z",
+  "description": "Compact index of mcp-trino computed knowledge artifacts. Load full artifacts for detail.",
+  "type_index": {
+    "total_types": 4,
+    "total_functions": 5,
+    "total_packages": 3,
+    "top_packages": [
+      {
+        "pkg": "internal/mcp",
+        "structs": 2,
+        "interfaces": 0,
+        "functions": 3
+      },
+      {
+        "pkg": "internal/config",
+        "structs": 1,
+        "interfaces": 0,
+        "functions": 1
+      },
+      {
+        "pkg": "internal/trino",
+        "structs": 1,
+        "interfaces": 0,
+        "functions": 1
+      }
+    ],
+    "full_artifact": "type-index.json"
+  },
+  "interface_map": {
+    "total_interfaces": 0,
+    "top_by_implementors": [],
+    "full_artifact": "interface-map.json"
+  },
+  "internal_deps": {
+    "total_packages": 5,
+    "most_depended_on": [
+      {
+        "pkg": "internal/config",
+        "imported_by_count": 3
+      },
+      {
+        "pkg": "internal/trino",
+        "imported_by_count": 2
+      },
+      {
+        "pkg": "internal/mcp",
+        "imported_by_count": 1
+      },
+      {
+        "pkg": "cmd",
+        "imported_by_count": 0
+      },
+      {
+        "pkg": "examples",
+        "imported_by_count": 0
+      }
+    ],
+    "most_dependencies": [
+      {
+        "pkg": "cmd",
+        "imports_count": 3
+      },
+      {
+        "pkg": "internal/mcp",
+        "imports_count": 2
+      },
+      {
+        "pkg": "internal/trino",
+        "imports_count": 1
+      },
+      {
+        "pkg": "examples",
+        "imports_count": 0
+      },
+      {
+        "pkg": "internal/config",
+        "imports_count": 0
+      }
+    ],
+    "full_artifact": "internal-deps.json"
+  },
+  "git_intelligence": {
+    "period_days": 180,
+    "top_churn_files": [
+      {
+        "file": "internal/trino/client.go",
+        "commits": 1,
+        "lines_added": 552,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/trino/client_test.go",
+        "commits": 1,
+        "lines_added": 497,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/mcp/server.go",
+        "commits": 1,
+        "lines_added": 288,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/mcp/handlers.go",
+        "commits": 1,
+        "lines_added": 274,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/config/oauth_test.go",
+        "commits": 1,
+        "lines_added": 181,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/config/config.go",
+        "commits": 1,
+        "lines_added": 218,
+        "lines_deleted": 0
+      },
+      {
+        "file": "internal/config/config_test.go",
+        "commits": 1,
+        "lines_added": 260,
+        "lines_deleted": 0
+      },
+      {
+        "file": "examples/test_query.go",
+        "commits": 1,
+        "lines_added": 145,
+        "lines_deleted": 0
+      },
+      {
+        "file": "cmd/main.go",
+        "commits": 1,
+        "lines_added": 82,
+        "lines_deleted": 0
+      }
+    ],
+    "top_bug_hotspots": [],
+    "full_artifact": "git-intelligence.json"
+  },
+  "api_surface": {
+    "note": "API surface artifact is small enough to load directly.",
+    "full_artifact": "api-surface.json"
+  },
+  "concurrency_map": {
+    "total_goroutines": 2,
+    "total_channels": 6,
+    "total_mutexes": 0,
+    "total_contexts": 3,
+    "packages_with_concurrency": 2,
+    "top_packages": [
+      {
+        "package": "internal/mcp",
+        "goroutines": 2,
+        "channels": 6,
+        "mutexes": 0,
+        "contexts": 2
+      },
+      {
+        "package": "cmd",
+        "goroutines": 0,
+        "channels": 0,
+        "mutexes": 0,
+        "contexts": 1
+      }
+    ],
+    "full_artifact": "concurrency-map.json"
+  },
+  "call_graph": {
+    "total_edges": 254,
+    "total_functions": 153,
+    "entry_points": 12,
+    "most_called_top10": [
+      {
+        "name": "log.Printf",
+        "callers": 17
+      },
+      {
+        "name": "fmt.Errorf",
+        "callers": 15
+      },
+      {
+        "name": "fmt.Sprintf",
+        "callers": 11
+      },
+      {
+        "name": "github.com/mark3labs/mcp-go/mcp.NewToolResultErrorFromErr",
+        "callers": 6
+      },
+      {
+        "name": "github.com/mark3labs/mcp-go/mcp.NewToolResultText",
+        "callers": 6
+      },
+      {
+        "name": "(*github.com/Vungle/mcp-trino/internal/trino.Client).ExecuteQuery",
+        "callers": 6
+      },
+      {
+        "name": "encoding/json.MarshalIndent",
+        "callers": 6
+      },
+      {
+        "name": "strings.TrimSpace",
+        "callers": 5
+      },
+      {
+        "name": "log.init",
+        "callers": 5
+      },
+      {
+        "name": "strings.init",
+        "callers": 5
+      }
+    ],
+    "top_packages_by_internal_edges": [
+      {
+        "pkg": "internal/trino",
+        "internal": 18,
+        "incoming": 11,
+        "outgoing": 1
+      },
+      {
+        "pkg": "examples",
+        "internal": 8,
+        "incoming": 0,
+        "outgoing": 0
+      },
+      {
+        "pkg": "internal/mcp",
+        "internal": 8,
+        "incoming": 4,
+        "outgoing": 8
+      },
+      {
+        "pkg": "internal/config",
+        "internal": 4,
+        "incoming": 4,
+        "outgoing": 0
+      },
+      {
+        "pkg": "cmd",
+        "internal": 2,
+        "incoming": 0,
+        "outgoing": 10
+      }
+    ],
+    "full_artifact": "call-graph.json"
+  }
+}

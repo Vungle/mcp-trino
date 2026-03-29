@@ -1,0 +1,106 @@
+{
+  "generated": "2026-03-20T03:16:46Z",
+  "module": "github.com/Vungle/mcp-trino",
+  "summary": {
+    "total_goroutines": 2,
+    "total_channels": 6,
+    "total_mutexes": 0,
+    "total_contexts": 3,
+    "packages_with_concurrency": 2
+  },
+  "goroutines": [
+    {
+      "file": "internal/mcp/server.go",
+      "line": 107,
+      "function": "*Server.ServeHTTP",
+      "expr": "s.handleSignals"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 109,
+      "function": "*Server.ServeHTTP",
+      "expr": "func literal"
+    }
+  ],
+  "channels": [
+    {
+      "file": "internal/mcp/server.go",
+      "line": 106,
+      "name": "",
+      "type": "bool",
+      "kind": "make"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 153,
+      "name": "done",
+      "type": "",
+      "kind": "receive"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 225,
+      "name": "done",
+      "type": "",
+      "kind": "declaration"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 226,
+      "name": "",
+      "type": "os.Signal",
+      "kind": "make"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 228,
+      "name": "ch",
+      "type": "",
+      "kind": "receive"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 229,
+      "name": "done",
+      "type": "",
+      "kind": "send"
+    }
+  ],
+  "mutexes": null,
+  "contexts": [
+    {
+      "file": "internal/mcp/server.go",
+      "line": 157,
+      "function": "*Server.ServeHTTP",
+      "pattern": "WithTimeout"
+    },
+    {
+      "file": "internal/mcp/server.go",
+      "line": 157,
+      "function": "*Server.ServeHTTP",
+      "pattern": "Background"
+    },
+    {
+      "file": "cmd/main.go",
+      "line": 46,
+      "function": "main",
+      "pattern": "Background"
+    }
+  ],
+  "package_summary": [
+    {
+      "package": "internal/mcp",
+      "goroutines": 2,
+      "channels": 6,
+      "mutexes": 0,
+      "contexts": 2
+    },
+    {
+      "package": "cmd",
+      "goroutines": 0,
+      "channels": 0,
+      "mutexes": 0,
+      "contexts": 1
+    }
+  ]
+}

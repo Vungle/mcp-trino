@@ -1,0 +1,37 @@
+# mcp-trino review rules
+
+global:
+  - "Security scan: govulncheck + Trivy in CI"
+
+internal/trino/:
+  - "SQL security changes (isReadOnlyQuery, isAllowedReadOnlyPattern, sanitizeQueryForKeywordDetection) require security audit"
+  - "New allowed query prefixes must be explicitly read-only — never allow write operations"
+  - "Allowlist changes (filterCatalogs/filterSchemas/filterTables) affect data access boundaries"
+  - "Connection string changes must not expose passwords — verify sanitizeConnectionError coverage"
+  - "Query timeout changes need validation — ensure positive values with fallback"
+
+internal/mcp/:
+  - "New tools must be registered in RegisterTrinoTools() with proper descriptions and parameter definitions"
+  - "New tools inherit OAuth middleware automatically via WithToolHandlerMiddleware() — no per-tool setup needed"
+  - "OAuth middleware must cover all HTTP endpoints — verify createMCPHandler applies auth checks"
+  - "Transport changes must maintain backward compatibility on /sse endpoint"
+  - "CORS configuration changes affect all MCP clients — verify Access-Control headers"
+
+internal/config/:
+  - "New environment variables need documentation in CLAUDE.md Configuration section"
+  - "OAuth config changes need security review — especially OIDC_CLIENT_SECRET handling"
+  - "Allowlist format validation must reject malformed entries at startup"
+  - "Deprecated env vars (OAUTH_REDIRECT_URI) need backward-compatible migration path"
+  - "Default value changes may break existing deployments — verify backward compatibility"
+
+charts/:
+  - "Helm value changes need deployment test in development and production value files"
+  - "New env vars must be added to charts/mcp-trino/templates/configmap.yaml or secret.yaml"
+  - "Security context must maintain runAsNonRoot, readOnlyRootFilesystem, drop ALL capabilities"
+  - "Ingress changes need ALB annotation review for AWS deployments"
+  - "OAuth secret values must go in secret.yaml, never configmap.yaml"
+
+cmd/:
+  - "main.go changes affect server startup sequence — verify Trino connection test still works"
+  - "Transport selection logic must handle unknown transport types gracefully"
+  - "Version injection via ldflags must be preserved in build changes"
